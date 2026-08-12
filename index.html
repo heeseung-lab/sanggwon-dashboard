@@ -284,6 +284,10 @@
   .score-row { display: grid; grid-template-columns: 170px 1fr 46px; gap: 10px; align-items: center; font-size: 12.5px; }
   .score-row .meter-track { height: 9px; background: var(--gridline); border-radius: 999px; overflow: hidden; }
   .score-row .meter-fill { height: 100%; border-radius: 999px; background: var(--seq-400); }
+  .score-row .score-input {
+    width: 46px; text-align: center; border: 1px solid var(--border); border-radius: 6px;
+    padding: 3px 4px; font-size: 12.5px; font-weight: 700; color: var(--ink-primary); background: var(--page-plane);
+  }
   .score-total {
     display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px;
     border-top: 1px solid var(--gridline);
@@ -498,10 +502,10 @@
     <p class="map-note">※ 실제 지도가 안 뜨면: 이 파일을 더블클릭으로 바로 열지 말고 로컬 서버로 실행(예: <code>python3 -m http.server</code>)한 뒤 <code>http://localhost:포트</code>를 카카오 디벨로퍼스 콘솔의 "플랫폼 &gt; Web"에 등록해야 합니다 — <code>file://</code>로 열면 도메인을 인식 못 해 지도가 표시되지 않을 수 있습니다.</p>
   </section>
 
-  <!-- 3. 상권 데이터 -->
+  <!-- 3. 업종별 상권 데이터 -->
   <section class="card">
-    <h2><span class="step">3</span> 상권 추정매출 데이터</h2>
-    <p class="desc">업종별 월 추정매출 · 우리마을가게 상권분석서비스 기준 (예시 수치)</p>
+    <h2><span class="step">3</span> 업종별 상권 데이터</h2>
+    <p class="desc">업종/브랜드 키워드로 실제 매장을 검색해 2번 지도에 표시합니다 (카카오맵 실검색)</p>
 
     <div class="kakao-key-bar">
       <input type="text" id="categoryKeywordInput" placeholder="업종/브랜드 키워드 검색 (예: 카페, 치킨, 신전떡볶이) → 2번 지도에 표시"
@@ -509,33 +513,7 @@
       <button type="button" onclick="runCategorySearch()">지도에 표시</button>
       <span id="categorySearchStatus" class="kakao-key-status"></span>
     </div>
-    <p class="map-note" style="margin-top:-4px;margin-bottom:12px;">※ 먼저 상단에서 주소 분석을 1회 실행해야 검색 기준 위치가 잡힙니다. 검색된 실제 매장에는 "그 매장의 실제 매출"이 아니라 아래 표의 업종 평균 추정치(예시)가 참고용 배지로 붙습니다.</p>
-
-    <table class="rpt-table" id="salesCategoryTable">
-      <thead><tr><th>업종</th><th>월 추정매출</th><th>유동인구(일)</th><th>집객시설</th></tr></thead>
-      <tbody>
-        <tr id="catRow-분식">
-          <td>분식</td>
-          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div><span class="bar-val" title="월 추정매출 3,200만원">3,200만원</span></div></td>
-          <td>12,400명</td><td>오피스 3 · 학원 2</td>
-        </tr>
-        <tr id="catRow-카페디저트">
-          <td>카페/디저트</td>
-          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:68%"></div></div><span class="bar-val" title="월 추정매출 2,800만원">2,800만원</span></div></td>
-          <td>12,400명</td><td>카페거리 인접</td>
-        </tr>
-        <tr id="catRow-치킨피자">
-          <td>치킨/피자</td>
-          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val" title="월 추정매출 4,100만원">4,100만원</span></div></td>
-          <td>12,400명</td><td>주거 밀집</td>
-        </tr>
-        <tr id="catRow-편의점">
-          <td>편의점</td>
-          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:46%"></div></div><span class="bar-val" title="월 추정매출 1,900만원">1,900만원</span></div></td>
-          <td>12,400명</td><td>-</td>
-        </tr>
-      </tbody>
-    </table>
+    <p class="map-note" style="margin-top:-4px;margin-bottom:12px;">※ 먼저 상단에서 주소 분석을 1회 실행해야 검색 기준 위치가 잡힙니다.</p>
   </section>
 
   <!-- 4. 경쟁 현황 -->
@@ -652,19 +630,19 @@
   <!-- 7. 종합 스코어 -->
   <section class="card">
     <h2><span class="step">7</span> 종합 스코어 (현장답사 7문항 체크리스트)</h2>
-    <p class="desc">항목별 5점 만점 — 예시 채점</p>
+    <p class="desc">항목별 5점 만점으로 직접 입력 — 현장답사 후 채점하면 최종 점수가 자동 계산됩니다</p>
     <div class="score-list">
-      <div class="score-row"><span>① 매장규모·좌석수</span><div class="meter-track"><div class="meter-fill" style="width:80%"></div></div><span>4/5</span></div>
-      <div class="score-row"><span>② 대기줄·주문비중</span><div class="meter-track"><div class="meter-fill" style="width:60%"></div></div><span>3/5</span></div>
-      <div class="score-row"><span>③ 가격·메뉴구성</span><div class="meter-track"><div class="meter-fill" style="width:80%"></div></div><span>4/5</span></div>
-      <div class="score-row"><span>④ 유동인구·경쟁분포</span><div class="meter-track"><div class="meter-fill" style="width:60%"></div></div><span>3/5</span></div>
-      <div class="score-row"><span>⑤ 리뷰·평점 추이</span><div class="meter-track"><div class="meter-fill" style="width:80%"></div></div><span>4/5</span></div>
-      <div class="score-row"><span>⑥ 임대시세·공실</span><div class="meter-track"><div class="meter-fill" style="width:60%"></div></div><span>3/5</span></div>
-      <div class="score-row"><span>⑦ 배후세대유형</span><div class="meter-track"><div class="meter-fill" style="width:80%"></div></div><span>4/5</span></div>
+      <div class="score-row"><span>① 매장규모·좌석수</span><div class="meter-track"><div class="meter-fill" id="scoreMeter1" style="width:80%"></div></div><input type="number" class="score-input" id="scoreInput1" min="1" max="5" step="1" value="4"></div>
+      <div class="score-row"><span>② 대기줄·주문비중</span><div class="meter-track"><div class="meter-fill" id="scoreMeter2" style="width:60%"></div></div><input type="number" class="score-input" id="scoreInput2" min="1" max="5" step="1" value="3"></div>
+      <div class="score-row"><span>③ 가격·메뉴구성</span><div class="meter-track"><div class="meter-fill" id="scoreMeter3" style="width:80%"></div></div><input type="number" class="score-input" id="scoreInput3" min="1" max="5" step="1" value="4"></div>
+      <div class="score-row"><span>④ 유동인구·경쟁분포</span><div class="meter-track"><div class="meter-fill" id="scoreMeter4" style="width:60%"></div></div><input type="number" class="score-input" id="scoreInput4" min="1" max="5" step="1" value="3"></div>
+      <div class="score-row"><span>⑤ 리뷰·평점 추이</span><div class="meter-track"><div class="meter-fill" id="scoreMeter5" style="width:80%"></div></div><input type="number" class="score-input" id="scoreInput5" min="1" max="5" step="1" value="4"></div>
+      <div class="score-row"><span>⑥ 임대시세·공실</span><div class="meter-track"><div class="meter-fill" id="scoreMeter6" style="width:60%"></div></div><input type="number" class="score-input" id="scoreInput6" min="1" max="5" step="1" value="3"></div>
+      <div class="score-row"><span>⑦ 배후세대유형</span><div class="meter-track"><div class="meter-fill" id="scoreMeter7" style="width:80%"></div></div><input type="number" class="score-input" id="scoreInput7" min="1" max="5" step="1" value="4"></div>
     </div>
     <div class="score-total">
-      <span style="font-size:13px;color:var(--ink-secondary)">총점 (35점 만점)</span>
-      <span class="num">25점 <span style="font-size:14px;color:var(--ink-muted);font-weight:500">· 상위 40% 수준 입지 (예시)</span></span>
+      <span style="font-size:13px;color:var(--ink-secondary)">최종 점수 (7문항 평균 · 5점 만점)</span>
+      <span class="num"><span id="finalScoreValue">3.6</span>점 <span style="font-size:14px;color:var(--ink-muted);font-weight:500">/ 5점</span></span>
     </div>
   </section>
 
@@ -690,19 +668,6 @@
   let kakaoMarkers = [];      // CustomOverlay 목록 — 재검색 시 지우고 다시 그림
   let categoryMarkers = [];   // 3번 섹션 업종 키워드 검색으로 찍은 마커 — 별도 관리
   let currentAnalysisCenter = null; // 마지막으로 분석한 위치(kakao.maps.LatLng) — 3번 섹션 검색 기준점
-
-  // 3번 섹션 표의 업종명과 매칭되는 키워드 (mock 데이터 — 실제 매출 API 없어 예시로 유지)
-  const CATEGORY_SALES_MAP = [
-    { rowId: 'catRow-분식', keywords: ['분식', '떡볶이', '순대', '튀김'], sales: 3200 },
-    { rowId: 'catRow-카페디저트', keywords: ['카페', '디저트', '커피', '베이커리'], sales: 2800 },
-    { rowId: 'catRow-치킨피자', keywords: ['치킨', '피자', '버거', '햄버거'], sales: 4100 },
-    { rowId: 'catRow-편의점', keywords: ['편의점'], sales: 1900 },
-  ];
-
-  function matchCategorySales(keyword) {
-    const lower = keyword.trim();
-    return CATEGORY_SALES_MAP.find((c) => c.keywords.some((k) => lower.includes(k))) || null;
-  }
 
   // 배달권역 폴리곤의 "모양"을 대상지 기준 상대좌표(위도차, 경도차)로 고정해두고,
   // 어떤 주소가 들어와도 그 지점 중심으로 같은 모양을 다시 그린다 (실제 도로기반 계산 전까지의 근사치)
@@ -974,15 +939,7 @@
       '※ 카카오맵 실검색 결과입니다(위치·거리는 실데이터). 매출·리뷰·배달비중은 아직 연동 전이라 표시하지 않습니다 — 실제 수치가 아닌 값을 실제 매장명 옆에 표시하지 않기 위한 조치입니다.';
   }
 
-  // --- 3번 섹션: 업종/브랜드 키워드 검색 → 2번 지도에 마커 + 업종평균(예시) 배지로 표시 ---
-  function highlightCategoryRow(rowId) {
-    document.querySelectorAll('#salesCategoryTable tbody tr').forEach(tr => tr.classList.remove('highlight'));
-    if (rowId) {
-      const row = document.getElementById(rowId);
-      if (row) row.classList.add('highlight');
-    }
-  }
-
+  // --- 3번 섹션(업종별 상권 데이터): 업종/브랜드 키워드 검색 → 2번 지도에 실제 매장 마커로 표시 ---
   async function runCategorySearch() {
     const keyword = document.getElementById('categoryKeywordInput').value.trim();
     const status = document.getElementById('categorySearchStatus');
@@ -1003,14 +960,11 @@
     status.className = 'kakao-key-status';
 
     const results = await kakaoPlacesSearch(keyword, currentAnalysisCenter, 1000);
-    const match = matchCategorySales(keyword);
-    highlightCategoryRow(match ? match.rowId : null);
 
     clearCategoryMarkers();
     const map = kakaoMapInstance;
     results.forEach(r => {
-      const badge = match ? ` · 업종평균 ${match.sales.toLocaleString('ko-KR')}만원(예시)` : '';
-      const label = `${r.place_name}${r.distance_m != null ? ' ' + r.distance_m + 'm' : ''}${badge}`;
+      const label = `${r.place_name}${r.distance_m != null ? ' ' + r.distance_m + 'm' : ''}`;
       addLabeledMarker(map, r.lat, r.lng, label, 'var(--seq-450)', categoryMarkers);
     });
 
@@ -1019,9 +973,7 @@
       status.className = 'kakao-key-status err';
       return;
     }
-    status.textContent = match
-      ? `✓ ${results.length}건 지도에 표시 — 업종평균 추정 ${match.sales.toLocaleString('ko-KR')}만원(예시) 배지 포함`
-      : `✓ ${results.length}건 지도에 표시 (일치하는 업종 평균 예시 데이터 없음)`;
+    status.textContent = `✓ ${results.length}건 지도에 표시 (카카오맵 실검색)`;
     status.className = 'kakao-key-status ok';
   }
 
@@ -1245,6 +1197,30 @@
   });
   computeSim('delivery');
   computeSim('hall');
+
+  // --- 7번 섹션: 현장답사 7문항 채점 입력 → 최종 점수(5점 만점, 7문항 평균) 자동 계산 ---
+  function updateFinalScore() {
+    let sum = 0, count = 0;
+    for (let i = 1; i <= 7; i++) {
+      const input = document.getElementById(`scoreInput${i}`);
+      const meter = document.getElementById(`scoreMeter${i}`);
+      if (!input) continue;
+      let v = parseFloat(input.value);
+      if (isNaN(v)) v = 0;
+      v = Math.max(0, Math.min(5, v));
+      if (meter) meter.style.width = `${(v / 5) * 100}%`;
+      sum += v;
+      count++;
+    }
+    const avg = count ? sum / count : 0;
+    const finalEl = document.getElementById('finalScoreValue');
+    if (finalEl) finalEl.textContent = avg.toFixed(1);
+  }
+
+  document.querySelectorAll('.score-input').forEach((inp) => {
+    inp.addEventListener('input', updateFinalScore);
+  });
+  updateFinalScore();
 
   // 파일에 키가 이미 저장되어 있으면 페이지를 열 때 자동으로 실제 지도를 띄운다
   if (document.getElementById('kakaoKeyInput').value.trim()) {
