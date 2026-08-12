@@ -213,6 +213,16 @@
   .kakao-key-status.err { color: var(--status-critical); }
   .key-saved-note { margin-top: -2px; margin-bottom: 12px; }
 
+  .api-key-settings { margin-bottom: 4px; }
+  .api-key-settings summary {
+    cursor: pointer; font-size: 11.5px; color: var(--ink-muted); list-style: none;
+    display: inline-flex; align-items: center; gap: 4px; padding: 2px 0;
+  }
+  .api-key-settings summary::-webkit-details-marker { display: none; }
+  .api-key-settings summary::before { content: '▸'; font-size: 10px; }
+  .api-key-settings[open] summary::before { content: '▾'; }
+  .api-key-settings > div { margin-top: 10px; }
+
   table.rpt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   table.rpt-table th {
     text-align: left; font-size: 11.5px; color: var(--ink-muted); font-weight: 600;
@@ -313,7 +323,7 @@
     }
     body { background: #fff; }
     .top-toolbar, .theme-btn, .print-btn { display: none !important; }
-    .kakao-key-bar, .map-note, #report-data { display: none !important; }
+    .kakao-key-bar, .map-note, #report-data, .api-key-settings { display: none !important; }
     .addr-status { display: none !important; }
     .addr-suggest-list { display: none !important; }
     .addr-input-row button { display: none !important; }
@@ -406,26 +416,30 @@
   <!-- 2. 지도 -->
   <section class="card">
     <h2><span class="step">2</span> 상권 지도<span class="tag" id="mapModeTag">홀+배달 모드</span></h2>
-    <p class="desc">경쟁점 위치·추정매출, 반경권역, 배달권역 — 카카오 JS 키를 입력하면 실제 지도로 전환됩니다</p>
+    <p class="desc">경쟁점 위치·추정매출, 반경권역, 배달권역 — 카카오맵 실데이터로 자동 표시됩니다</p>
 
-    <div class="kakao-key-bar">
-      <input type="password" id="kakaoKeyInput" value="368c1dca964838f49a7a3d46b810ea20"
-             placeholder="카카오 디벨로퍼스 JS 키 (선택 입력 — 없으면 레이아웃 목업 유지)">
-      <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('kakaoKeyInput', this)" title="키 보기/가리기">👁</button>
-      <button onclick="applyKakaoKey()">지도 적용</button>
-      <span id="kakaoKeyStatus" class="kakao-key-status"></span>
-    </div>
-    <p class="map-note key-saved-note">※ 이 파일에는 카카오 JS 키가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다. 화면에는 점(•)으로 가려져 있고, 눈 아이콘을 누르면 잠깐 확인할 수 있습니다. (JS 키는 원래 브라우저에서 쓰도록 만들어진 키라 노출을 감안한 키입니다 — 서버용 REST API 키는 절대 이 파일에 넣지 마세요.)</p>
+    <details class="api-key-settings" id="apiKeySettings">
+      <summary>⚙ API 키 설정 (평소엔 안 보여도 됨 — 키 교체가 필요할 때만 펼치기)</summary>
+      <div>
+        <div class="kakao-key-bar">
+          <input type="password" id="kakaoKeyInput" value="368c1dca964838f49a7a3d46b810ea20"
+                 placeholder="카카오 디벨로퍼스 JS 키 (선택 입력 — 없으면 레이아웃 목업 유지)">
+          <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('kakaoKeyInput', this)" title="키 보기/가리기">👁</button>
+          <button onclick="applyKakaoKey()">지도 적용</button>
+          <span id="kakaoKeyStatus" class="kakao-key-status"></span>
+        </div>
+        <p class="map-note key-saved-note">※ 이 파일에는 카카오 JS 키가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다. 화면에는 점(•)으로 가려져 있고, 눈 아이콘을 누르면 잠깐 확인할 수 있습니다. (JS 키는 원래 브라우저에서 쓰도록 만들어진 키라 노출을 감안한 키입니다 — 서버용 REST API 키는 절대 이 파일에 넣지 마세요.)</p>
 
-    <div class="kakao-key-bar">
-      <input type="password" id="jusoKeyInput" value="U01TX0FVVEgyMDI2MDgxMjEwMjQzNDExOTk3MTc="
-             placeholder="도로명주소 '검색 API' 승인키 (business.juso.go.kr → 도로명주소 > 검색 API 카드에서 발급, 선택)">
-      <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('jusoKeyInput', this)" title="키 보기/가리기">👁</button>
-      <span id="jusoKeyStatus" class="kakao-key-status"></span>
-    </div>
-    <p class="map-note key-saved-note">※ 이 파일에는 "검색 API" 승인키가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다 — 실제 검색까지 확인된 키입니다.</p>
-    <p class="map-note">※ 이 키가 없어도 헤더 입력창에 주소를 직접 타이핑해서 "분석"을 누르는 방식은 그대로 동작합니다 — 이 키는 "동/도로명만 입력해도 목록에서 골라 선택"하는 검색에만 필요합니다.</p>
-    <p class="map-note">※ 이 키가 없어도 헤더 입력창에 주소를 직접 타이핑해서 "분석"을 누르는 방식은 그대로 동작합니다 — 이 키는 "동/도로명만 입력해도 목록에서 골라 선택"하는 검색에만 필요합니다.</p>
+        <div class="kakao-key-bar">
+          <input type="password" id="jusoKeyInput" value="U01TX0FVVEgyMDI2MDgxMjEwMjQzNDExOTk3MTc="
+                 placeholder="도로명주소 '검색 API' 승인키 (business.juso.go.kr → 도로명주소 > 검색 API 카드에서 발급, 선택)">
+          <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('jusoKeyInput', this)" title="키 보기/가리기">👁</button>
+          <span id="jusoKeyStatus" class="kakao-key-status"></span>
+        </div>
+        <p class="map-note key-saved-note">※ 이 파일에는 "검색 API" 승인키가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다 — 실제 검색까지 확인된 키입니다.</p>
+        <p class="map-note">※ 이 키가 없어도 헤더 입력창에 주소를 직접 타이핑해서 "분석"을 누르는 방식은 그대로 동작합니다 — 이 키는 "동/도로명만 입력해도 목록에서 골라 선택"하는 검색에만 필요합니다.</p>
+      </div>
+    </details>
 
     <script id="report-data" type="application/json">
     {
