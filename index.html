@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>상권분석 보고서 양식 — 청년다방 가맹개발영업</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --ink-primary:    #0b0b0b;
+    --ink-secondary:  #52514e;
+    --ink-muted:      #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-350: #5598e7;
+    --seq-400: #3987e5; --seq-450: #2a78d6; --seq-550: #1c5cab;
+    --status-good: #0ca30c; --status-warning: #fab219;
+    --status-serious: #ec835a; --status-critical: #d03b3b;
+    --brand: #4f8892; --brand-strong: #3d6d76; --brand-tint: #e7f0f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --ink-primary:    #ffffff;
+      --ink-secondary:  #c3c2b7;
+      --ink-muted:      #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --seq-400: #3987e5; --seq-450: #2a78d6; --seq-550: #184f95;
+      --brand: #6ca6af; --brand-strong: #86bcc4; --brand-tint: #1f3336;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --ink-primary:    #ffffff;
+    --ink-secondary:  #c3c2b7;
+    --ink-muted:      #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --seq-400: #3987e5; --seq-450: #2a78d6; --seq-550: #184f95;
+    --brand: #6ca6af; --brand-strong: #86bcc4; --brand-tint: #1f3336;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  }
+  .viz-root {
+    display: block;
+    min-height: 100vh;
+    background: var(--page-plane);
+    color: var(--ink-primary);
+  }
+  .report-shell {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+  .top-toolbar {
+    display: flex; justify-content: flex-end; align-items: center;
+    gap: 8px; padding: 8px 2px 12px; font-size: 12px; color: var(--ink-muted);
+  }
+  .theme-btn {
+    border: 1px solid var(--border); background: var(--surface-1);
+    color: var(--ink-secondary); border-radius: 999px; padding: 5px 12px;
+    font-size: 12px; cursor: pointer;
+  }
+  .theme-btn:hover { border-color: var(--brand); color: var(--brand-strong); }
+
+  .header-bar {
+    background: linear-gradient(135deg, var(--brand-strong), var(--brand));
+    color: #fff;
+    border-radius: 16px;
+    padding: 22px 26px;
+    display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end;
+  }
+  .header-bar .eyebrow { font-size: 12px; letter-spacing: .06em; opacity: .85; text-transform: uppercase; }
+  .header-bar h1 { margin: 4px 0 2px; font-size: 22px; }
+  .header-bar .sub { font-size: 13px; opacity: .9; }
+  .addr-box {
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 360px;
+    font-size: 13px;
+  }
+  .addr-box label { display: block; font-size: 11px; opacity: .85; margin-bottom: 5px; }
+  .addr-box .addr-value { font-size: 15px; font-weight: 600; }
+  .addr-box .addr-note { font-size: 11px; opacity: .75; margin-top: 4px; }
+  .addr-input-row { display: flex; gap: 6px; }
+  .addr-input-row input {
+    flex: 1; min-width: 0; border: none; border-radius: 7px; padding: 7px 10px;
+    font-size: 13.5px; background: rgba(255,255,255,0.92); color: #0b0b0b;
+  }
+  .addr-input-row button {
+    border: none; border-radius: 7px; padding: 7px 12px; font-size: 12.5px; font-weight: 700;
+    background: #0b0b0b; color: #fff; cursor: pointer; white-space: nowrap;
+  }
+  .addr-input-row button:hover { background: #2a2a2a; }
+  .addr-input-row button[onclick^="runJusoSearch"] { background: rgba(255,255,255,0.25); color: #fff; }
+  .addr-input-row button[onclick^="runJusoSearch"]:hover { background: rgba(255,255,255,0.4); }
+  .addr-status { font-size: 11px; margin-top: 6px; opacity: .9; min-height: 14px; }
+  .addr-suggest {
+    position: relative;
+  }
+  .addr-suggest-list {
+    position: absolute; z-index: 20; top: 100%; left: 0; right: 0; margin-top: 4px;
+    background: var(--card-plane, #fff); border: 1px solid rgba(11,11,11,0.15); border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18); max-height: 220px; overflow-y: auto; display: none;
+  }
+  .addr-suggest-list.open { display: block; }
+  .addr-suggest-item {
+    padding: 8px 12px; font-size: 12.5px; color: #0b0b0b; cursor: pointer; border-bottom: 1px solid rgba(11,11,11,0.06);
+  }
+  .addr-suggest-item:last-child { border-bottom: none; }
+  .addr-suggest-item:hover { background: #f0efe9; }
+  .addr-suggest-item .addr-main { font-weight: 600; }
+  .addr-suggest-item .addr-sub { font-size: 11px; color: #6a6a66; margin-top: 2px; }
+  .addr-status.ok { color: #d7f5df; font-weight: 600; }
+  .addr-status.err { color: #ffd9d3; font-weight: 600; }
+
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 12px; color: var(--ink-secondary);
+  }
+  .meta-row span b { color: var(--ink-primary); }
+
+  .type-toggle {
+    display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden;
+    margin-top: 14px; background: var(--surface-1);
+  }
+  .type-toggle button {
+    border: none; background: transparent; padding: 8px 16px; font-size: 13px; cursor: pointer;
+    color: var(--ink-secondary); font-weight: 600;
+  }
+  .type-toggle button.active { background: var(--brand); color: #fff; }
+
+  section.card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-top: 18px;
+  }
+  section.card h2 {
+    font-size: 15px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px;
+  }
+  section.card h2 .step {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 6px; background: var(--brand-tint);
+    color: var(--brand-strong); font-size: 12px; font-weight: 700;
+  }
+  section.card .desc { font-size: 12.5px; color: var(--ink-muted); margin: 0 0 14px; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat-tile {
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--page-plane);
+  }
+  .stat-tile .label { font-size: 11.5px; color: var(--ink-muted); }
+  .stat-tile .value { font-size: 18px; font-weight: 700; margin-top: 3px; }
+  .stat-tile .foot { font-size: 11px; color: var(--ink-secondary); margin-top: 2px; }
+
+  /* --- map mockup --- */
+  .map-wrap {
+    position: relative; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border); background:
+      repeating-linear-gradient(0deg, var(--gridline) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(90deg, var(--gridline) 0 1px, transparent 1px 34px),
+      var(--surface-1);
+    height: 380px;
+  }
+  .map-badge {
+    position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.55); color: #fff;
+    font-size: 11px; padding: 4px 9px; border-radius: 999px; z-index: 5;
+  }
+  .map-legend {
+    display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; font-size: 12px; color: var(--ink-secondary);
+  }
+  .map-legend .item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .map-note { font-size: 11px; color: var(--ink-muted); margin: 10px 0 0; line-height: 1.6; }
+  .map-note code { background: var(--gridline); padding: 1px 5px; border-radius: 4px; font-size: 10.5px; }
+
+  .kakao-key-bar {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+  }
+  .kakao-key-bar input {
+    flex: 1; min-width: 220px; border: 1px solid var(--border); background: var(--page-plane);
+    color: var(--ink-primary); border-radius: 8px; padding: 8px 10px; font-size: 12.5px;
+  }
+  .kakao-key-bar button {
+    border: none; background: var(--brand); color: #fff; border-radius: 8px; padding: 8px 14px;
+    font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .kakao-key-bar button:hover { background: var(--brand-strong); }
+  .kakao-key-bar .key-eye-btn {
+    background: var(--page-plane); color: var(--ink-secondary); border: 1px solid var(--border);
+    padding: 8px 10px; font-size: 13px;
+  }
+  .kakao-key-bar .key-eye-btn:hover { background: var(--gridline); color: var(--ink-primary); }
+  .kakao-key-status { font-size: 11.5px; color: var(--ink-muted); }
+  .kakao-key-status.ok { color: var(--status-good); }
+  .kakao-key-status.err { color: var(--status-critical); }
+  .key-saved-note { margin-top: -2px; margin-bottom: 12px; }
+
+  table.rpt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.rpt-table th {
+    text-align: left; font-size: 11.5px; color: var(--ink-muted); font-weight: 600;
+    border-bottom: 1px solid var(--gridline); padding: 6px 10px;
+  }
+  table.rpt-table td {
+    padding: 9px 10px; border-bottom: 1px solid var(--gridline); color: var(--ink-primary);
+    vertical-align: middle;
+  }
+  table.rpt-table tr.highlight td { background: var(--brand-tint); }
+  .bar-cell { display: flex; align-items: center; gap: 8px; min-width: 160px; }
+  .bar-track { flex: 1; height: 8px; background: var(--gridline); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; background: var(--seq-450); }
+  .bar-val { font-size: 12px; color: var(--ink-secondary); white-space: nowrap; }
+
+  .sw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .sw-col h3 { font-size: 13px; margin: 0 0 10px; }
+  .sw-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+  .sw-list li { display: flex; gap: 9px; font-size: 13px; line-height: 1.45; }
+  .sw-icon { flex: 0 0 auto; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; margin-top: 1px; }
+  .sw-icon.good { background: var(--status-good); }
+  .sw-icon.warn { background: var(--status-serious); }
+
+  .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .sim-card {
+    border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--page-plane);
+    opacity: .6; transition: opacity .15s, border-color .15s;
+  }
+  .sim-card.active { opacity: 1; border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
+  .sim-card h4 { margin: 0 0 10px; font-size: 13.5px; display: flex; align-items: center; gap: 6px; }
+  .sim-card .row { display: flex; justify-content: space-between; font-size: 12.5px; padding: 4px 0; border-bottom: 1px dashed var(--gridline); }
+  .sim-card .row:last-child { border-bottom: none; }
+  .sim-card .row b { font-weight: 700; }
+  .sim-input-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 12.5px; }
+  .sim-input-row label { color: var(--ink-secondary); }
+  .sim-input {
+    width: 100px; text-align: right; border: 1px solid var(--border); background: var(--surface-1);
+    color: var(--ink-primary); border-radius: 6px; padding: 4px 8px; font-size: 12.5px;
+    font-family: inherit; font-weight: 700;
+  }
+  .sim-result {
+    display: flex; gap: 10px; margin: 10px 0; padding: 10px; border-radius: 8px;
+    background: var(--brand-tint);
+  }
+  .sim-result-item { flex: 1; text-align: center; }
+  .sim-result-item span { display: block; font-size: 11px; color: var(--ink-muted); margin-bottom: 2px; }
+  .sim-result-item b { font-size: 15px; color: var(--brand-strong); }
+  .sim-reset-btn {
+    margin-top: 8px; width: 100%; border: 1px solid var(--border); background: transparent;
+    color: var(--ink-muted); border-radius: 7px; padding: 6px; font-size: 11.5px; cursor: pointer;
+  }
+  .sim-reset-btn:hover { background: var(--page-plane); color: var(--ink-secondary); }
+  @media print {
+    .sim-input { border: none; background: transparent; }
+    .sim-reset-btn { display: none; }
+  }
+
+  .score-list { display: flex; flex-direction: column; gap: 10px; }
+  .score-row { display: grid; grid-template-columns: 170px 1fr 46px; gap: 10px; align-items: center; font-size: 12.5px; }
+  .score-row .meter-track { height: 9px; background: var(--gridline); border-radius: 999px; overflow: hidden; }
+  .score-row .meter-fill { height: 100%; border-radius: 999px; background: var(--seq-400); }
+  .score-total {
+    display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid var(--gridline);
+  }
+  .score-total .num { font-size: 26px; font-weight: 800; color: var(--brand-strong); }
+
+  .disclaimer {
+    margin-top: 18px; font-size: 11.5px; color: var(--ink-muted); line-height: 1.6;
+    border-top: 1px solid var(--gridline); padding-top: 12px;
+  }
+  .tag {
+    display: inline-block; font-size: 10.5px; padding: 2px 7px; border-radius: 5px;
+    background: var(--brand-tint); color: var(--brand-strong); font-weight: 700; margin-left: 6px;
+  }
+
+  @media (max-width: 720px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .sw-grid, .sim-grid { grid-template-columns: 1fr; }
+    .score-row { grid-template-columns: 110px 1fr 40px; }
+  }
+
+  /* --- print / PDF export --- */
+  @media print {
+    :root, :root[data-theme="dark"] { color-scheme: light; }
+    .viz-root, :root[data-theme="dark"] .viz-root {
+      color-scheme: light !important;
+      --surface-1:      #ffffff !important;
+      --page-plane:     #ffffff !important;
+      --ink-primary:    #0b0b0b !important;
+      --ink-secondary:  #52514e !important;
+      --ink-muted:      #6b6a66 !important;
+      --gridline:       #dcdbd4 !important;
+      --border:         rgba(11,11,11,0.16) !important;
+      --brand:          #4f8892 !important;
+      --brand-strong:   #3d6d76 !important;
+      --brand-tint:     #eef4f4 !important;
+    }
+    body { background: #fff; }
+    .top-toolbar, .theme-btn, .print-btn { display: none !important; }
+    .kakao-key-bar, .map-note, #report-data { display: none !important; }
+    .addr-status { display: none !important; }
+    .addr-suggest-list { display: none !important; }
+    .addr-input-row button { display: none !important; }
+    .addr-input-row input { background: #fff !important; border: 1px solid #ccc !important; }
+    .type-toggle { border-color: #999; }
+    .type-toggle button.active { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .header-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .addr-box .addr-note { display: none; }
+    .map-badge { display: none; }
+    .report-shell { max-width: 100%; padding: 0; }
+    section.card {
+      box-shadow: none; border: 1px solid #ccc;
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .bar-fill, .meter-fill, #deliveryZone, circle { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .disclaimer { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="report-shell">
+
+  <div class="top-toolbar">
+    <span>주소·지도·경쟁점 검색 실연동 · 상권매출은 예시</span>
+    <button class="theme-btn print-btn" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">다크모드</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header-bar">
+    <div>
+      <div class="eyebrow">청년다방 가맹개발영업 · 상권분석 보고서</div>
+      <h1>상권분석 리포트</h1>
+      <div class="sub">주소를 입력하면 카카오맵으로 실제 위치·경쟁점을 검색합니다 (상권매출은 아직 예시 데이터)</div>
+    </div>
+    <div class="addr-box">
+      <label>분석 대상 주소</label>
+      <div class="addr-input-row addr-suggest">
+        <input type="text" id="addrInput" value="서울특별시 성동구 성수동2가" placeholder="분석할 주소를 입력하세요"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();runJusoSearch();}">
+        <button type="button" onclick="runJusoSearch()" title="동/도로명만 입력해도 공공데이터에서 목록 검색 (도로명주소 검색 API)">주소찾기</button>
+        <button type="button" onclick="runAddressSearch()">분석</button>
+        <div id="addrSuggestList" class="addr-suggest-list"></div>
+      </div>
+      <div id="addrStatus" class="addr-status"></div>
+    </div>
+  </div>
+
+  <div class="meta-row">
+    <span>분석일자 <b>2026-08-11</b></span>
+    <span>담당자 <b>가맹개발영업팀</b></span>
+    <span>진입유형 <b id="entryTypeMeta">신규진입형 · Tier 2 (예시)</b></span>
+    <span>데이터 출처 <b>카카오맵 API (경쟁점·지도 실연동) · 공공데이터 상권매출(예시)</b></span>
+  </div>
+
+  <div class="type-toggle" id="typeToggle">
+    <button data-type="delivery" onclick="setStoreType('delivery')">배달전문 매장</button>
+    <button data-type="hall" class="active" onclick="setStoreType('hall')">홀+배달 매장</button>
+  </div>
+
+  <!-- 1. 지역개요 -->
+  <section class="card">
+    <h2><span class="step">1</span> 지역 개요</h2>
+    <p class="desc">시군구 단위 진입유형·인구·경쟁 밀도 — M2 신규출점 우선순위 로직 기준</p>
+    <div class="stat-grid">
+      <div class="stat-tile">
+        <div class="label">행정동</div>
+        <div class="value" id="regionDongValue">성수동2가</div>
+        <div class="foot" id="regionDongFoot">서울특별시 성동구</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">진입유형</div>
+        <div class="value" id="entryTypeValue">신규진입형</div>
+        <div class="foot" id="entryTypeFoot">청년다방 매장 0개 시군구 (예시)</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">시군구 인구</div>
+        <div class="value" id="populationValue">27.4만</div>
+        <div class="foot" id="populationFoot">공백 읍면동 8곳 (예시)</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">경쟁매장 (시군구)</div>
+        <div class="value" id="competitorCountValue">8개</div>
+        <div class="foot" id="competitorCountFoot">Tier 2 · 경쟁 3~4개 구간 (예시)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 지도 -->
+  <section class="card">
+    <h2><span class="step">2</span> 상권 지도<span class="tag" id="mapModeTag">홀+배달 모드</span></h2>
+    <p class="desc">경쟁점 위치·추정매출, 반경권역, 배달권역 — 카카오 JS 키를 입력하면 실제 지도로 전환됩니다</p>
+
+    <div class="kakao-key-bar">
+      <input type="password" id="kakaoKeyInput" value="368c1dca964838f49a7a3d46b810ea20"
+             placeholder="카카오 디벨로퍼스 JS 키 (선택 입력 — 없으면 레이아웃 목업 유지)">
+      <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('kakaoKeyInput', this)" title="키 보기/가리기">👁</button>
+      <button onclick="applyKakaoKey()">지도 적용</button>
+      <span id="kakaoKeyStatus" class="kakao-key-status"></span>
+    </div>
+    <p class="map-note key-saved-note">※ 이 파일에는 카카오 JS 키가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다. 화면에는 점(•)으로 가려져 있고, 눈 아이콘을 누르면 잠깐 확인할 수 있습니다. (JS 키는 원래 브라우저에서 쓰도록 만들어진 키라 노출을 감안한 키입니다 — 서버용 REST API 키는 절대 이 파일에 넣지 마세요.)</p>
+
+    <div class="kakao-key-bar">
+      <input type="password" id="jusoKeyInput" value="U01TX0FVVEgyMDI2MDgxMjEwMjQzNDExOTk3MTc="
+             placeholder="도로명주소 '검색 API' 승인키 (business.juso.go.kr → 도로명주소 > 검색 API 카드에서 발급, 선택)">
+      <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('jusoKeyInput', this)" title="키 보기/가리기">👁</button>
+      <span id="jusoKeyStatus" class="kakao-key-status"></span>
+    </div>
+    <p class="map-note key-saved-note">※ 이 파일에는 "검색 API" 승인키가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다 — 실제 검색까지 확인된 키입니다.</p>
+    <p class="map-note">※ 이 키가 없어도 헤더 입력창에 주소를 직접 타이핑해서 "분석"을 누르는 방식은 그대로 동작합니다 — 이 키는 "동/도로명만 입력해도 목록에서 골라 선택"하는 검색에만 필요합니다.</p>
+    <p class="map-note">※ 이 키가 없어도 헤더 입력창에 주소를 직접 타이핑해서 "분석"을 누르는 방식은 그대로 동작합니다 — 이 키는 "동/도로명만 입력해도 목록에서 골라 선택"하는 검색에만 필요합니다.</p>
+
+    <script id="report-data" type="application/json">
+    {
+      "target": {"lat": 37.5445, "lng": 127.0559, "label": "출점후보지"},
+      "competitors": [
+        {"brand": "신전떡볶이", "lat": 37.5454, "lng": 127.0548, "distance_m": 280},
+        {"brand": "동대문엽기떡볶이", "lat": 37.5457, "lng": 127.0567, "distance_m": 410},
+        {"brand": "스텔라떡볶이", "lat": 37.5430, "lng": 127.0573, "distance_m": 620}
+      ],
+      "delivery_zone": [
+        [37.5580, 127.0559], [37.5545, 127.0669], [37.5445, 127.0719],
+        [37.5355, 127.0689], [37.5315, 127.0579], [37.5345, 127.0469],
+        [37.5425, 127.0419], [37.5535, 127.0459]
+      ],
+      "radius_rings_m": [300, 500, 1000]
+    }
+    </script>
+
+    <div class="map-wrap">
+      <div class="map-badge">카카오맵 API 연동 예정 · 현재는 레이아웃 목업</div>
+      <div id="kakaoMapDiv" style="display:none;width:100%;height:100%;"></div>
+      <svg id="mockMapSvg" viewBox="0 0 760 380" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+        <!-- delivery zone polygon -->
+        <polygon id="deliveryZone" points="180,60 420,40 560,120 600,240 480,340 260,330 120,260 100,150"
+                 fill="var(--brand)" opacity="0.16" stroke="var(--brand)" stroke-width="2" stroke-dasharray="6 4"/>
+        <!-- radius rings -->
+        <circle id="ring300" cx="380" cy="190" r="55" fill="none" stroke="var(--ink-muted)" stroke-width="1.4" stroke-dasharray="4 4" opacity="0.8"/>
+        <circle id="ring500" cx="380" cy="190" r="95" fill="none" stroke="var(--ink-muted)" stroke-width="1.4" stroke-dasharray="4 4" opacity="0.55"/>
+        <circle id="ring1000" cx="380" cy="190" r="150" fill="none" stroke="var(--ink-muted)" stroke-width="1.4" stroke-dasharray="4 4" opacity="0.35"/>
+        <!-- target marker -->
+        <circle cx="380" cy="190" r="9" fill="var(--brand-strong)" stroke="#fff" stroke-width="2"/>
+        <text x="380" y="215" text-anchor="middle" font-size="12" fill="var(--ink-primary)" font-weight="700">출점후보지</text>
+
+        <!-- competitors -->
+        <g>
+          <circle cx="330" cy="150" r="6" fill="var(--status-serious)" stroke="#fff" stroke-width="1.5" title="신전떡볶이 · 280m · 월 추정 3,450만원"/>
+          <text x="330" y="136" text-anchor="middle" font-size="11" fill="var(--ink-secondary)">신전떡볶이 280m</text>
+        </g>
+        <g>
+          <circle cx="450" cy="160" r="6" fill="var(--status-serious)" stroke="#fff" stroke-width="1.5" title="동대문엽기떡볶이 · 410m · 월 추정 2,980만원"/>
+          <text x="450" y="146" text-anchor="middle" font-size="11" fill="var(--ink-secondary)">엽기떡볶이 410m</text>
+        </g>
+        <g>
+          <circle cx="470" cy="255" r="6" fill="var(--status-serious)" stroke="#fff" stroke-width="1.5" title="스텔라떡볶이 · 620m · 월 추정 2,150만원"/>
+          <text x="470" y="270" text-anchor="middle" font-size="11" fill="var(--ink-secondary)">스텔라떡볶이 620m</text>
+        </g>
+      </svg>
+    </div>
+    <div class="map-legend">
+      <span class="item"><span class="legend-dot" style="background:var(--brand-strong)"></span>출점 후보지</span>
+      <span class="item"><span class="legend-dot" style="background:var(--status-serious)"></span>경쟁 브랜드 매장</span>
+      <span class="item"><span class="legend-dot" style="background:transparent;border:1.5px dashed var(--ink-muted)"></span>반경 300 / 500 / 1,000m</span>
+      <span class="item"><span class="legend-dot" style="background:var(--brand);opacity:.5"></span>배달권역(도로기반 추정)</span>
+      <span class="item"><span class="legend-dot" style="background:var(--seq-450)"></span>업종 키워드 검색 결과 (3번 섹션)</span>
+    </div>
+    <p class="map-note">※ 실제 지도가 안 뜨면: 이 파일을 더블클릭으로 바로 열지 말고 로컬 서버로 실행(예: <code>python3 -m http.server</code>)한 뒤 <code>http://localhost:포트</code>를 카카오 디벨로퍼스 콘솔의 "플랫폼 &gt; Web"에 등록해야 합니다 — <code>file://</code>로 열면 도메인을 인식 못 해 지도가 표시되지 않을 수 있습니다.</p>
+  </section>
+
+  <!-- 3. 상권 데이터 -->
+  <section class="card">
+    <h2><span class="step">3</span> 상권 추정매출 데이터</h2>
+    <p class="desc">업종별 월 추정매출 · 우리마을가게 상권분석서비스 기준 (예시 수치)</p>
+
+    <div class="kakao-key-bar">
+      <input type="text" id="categoryKeywordInput" placeholder="업종/브랜드 키워드 검색 (예: 카페, 치킨, 신전떡볶이) → 2번 지도에 표시"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();runCategorySearch();}">
+      <button type="button" onclick="runCategorySearch()">지도에 표시</button>
+      <span id="categorySearchStatus" class="kakao-key-status"></span>
+    </div>
+    <p class="map-note" style="margin-top:-4px;margin-bottom:12px;">※ 먼저 상단에서 주소 분석을 1회 실행해야 검색 기준 위치가 잡힙니다. 검색된 실제 매장에는 "그 매장의 실제 매출"이 아니라 아래 표의 업종 평균 추정치(예시)가 참고용 배지로 붙습니다.</p>
+
+    <table class="rpt-table" id="salesCategoryTable">
+      <thead><tr><th>업종</th><th>월 추정매출</th><th>유동인구(일)</th><th>집객시설</th></tr></thead>
+      <tbody>
+        <tr id="catRow-분식">
+          <td>분식</td>
+          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div><span class="bar-val" title="월 추정매출 3,200만원">3,200만원</span></div></td>
+          <td>12,400명</td><td>오피스 3 · 학원 2</td>
+        </tr>
+        <tr id="catRow-카페디저트">
+          <td>카페/디저트</td>
+          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:68%"></div></div><span class="bar-val" title="월 추정매출 2,800만원">2,800만원</span></div></td>
+          <td>12,400명</td><td>카페거리 인접</td>
+        </tr>
+        <tr id="catRow-치킨피자">
+          <td>치킨/피자</td>
+          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val" title="월 추정매출 4,100만원">4,100만원</span></div></td>
+          <td>12,400명</td><td>주거 밀집</td>
+        </tr>
+        <tr id="catRow-편의점">
+          <td>편의점</td>
+          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:46%"></div></div><span class="bar-val" title="월 추정매출 1,900만원">1,900만원</span></div></td>
+          <td>12,400명</td><td>-</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 4. 경쟁 현황 -->
+  <section class="card">
+    <h2><span class="step">4</span> 경쟁 현황</h2>
+    <p class="desc">반경 1km 내 동종 브랜드 위치·매출·리뷰·배달비중 (예시)</p>
+    <table class="rpt-table">
+      <thead><tr><th>브랜드</th><th>거리</th><th>월 추정매출</th><th>리뷰 / 평점</th><th>배달비중</th></tr></thead>
+      <tbody>
+        <tr class="highlight">
+          <td><b>청년다방 (후보지 시뮬레이션)</b></td>
+          <td>-</td>
+          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:78%;background:var(--brand-strong)"></div></div><span class="bar-val">3,200만원</span></div></td>
+          <td>-</td><td>61%</td>
+        </tr>
+      </tbody>
+      <tbody id="competitorRows">
+        <tr>
+          <td>신전떡볶이</td><td>280m</td>
+          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:84%"></div></div><span class="bar-val">3,450만원</span></div></td>
+          <td>812건 / 4.3</td><td>58%</td>
+        </tr>
+        <tr>
+          <td>동대문엽기떡볶이</td><td>410m</td>
+          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:73%"></div></div><span class="bar-val">2,980만원</span></div></td>
+          <td>505건 / 4.1</td><td>45%</td>
+        </tr>
+        <tr>
+          <td>스텔라떡볶이</td><td>620m</td>
+          <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:52%"></div></div><span class="bar-val">2,150만원</span></div></td>
+          <td>210건 / 4.0</td><td>62%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="map-note" id="competitorTableNote">※ 위 표는 예시입니다. 상단에서 주소로 분석을 실행하면 카카오맵 실검색 결과로 교체되며, 실검색 결과의 매출·리뷰는 아직 연동 전이라 "데이터 연동 예정"으로 표시됩니다.</p>
+  </section>
+
+  <!-- 5. 경쟁력 분석 -->
+  <section class="card">
+    <h2><span class="step">5</span> 청년다방 경쟁력 분석</h2>
+    <p class="desc">브랜드 강점 vs 이 상권에서 실제로 드러나는 불리한 점</p>
+    <div class="sw-grid">
+      <div class="sw-col">
+        <h3>강점</h3>
+        <ul class="sw-list">
+          <li><span class="sw-icon good">✓</span>10년째 운영 중인 브랜드 안정성 (경쟁 평균 존속연수 3.5년 대비)</li>
+          <li><span class="sw-icon good">✓</span>타사 대비 100% 높은 객단가</li>
+          <li><span class="sw-icon good">✓</span>자체 ERP 시스템 기반 매장관리 · 투명한 운영 데이터</li>
+          <li><span class="sw-icon good">✓</span>3트랙(신규·배달전문·업종변경) 투자 유연성</li>
+        </ul>
+      </div>
+      <div class="sw-col">
+        <h3>불리한 점</h3>
+        <ul class="sw-list">
+          <li><span class="sw-icon warn">!</span>반경 500m 내 떡볶이 프랜차이즈 3개 기영업 — 경쟁 과밀 구간</li>
+          <li><span class="sw-icon warn">!</span>배달권역이 신전떡볶이와 약 70% 중첩 추정</li>
+          <li><span class="sw-icon warn">!</span>신규진입형 지역 — 지역 내 브랜드 인지도 사전 축적 없음</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 매장유형별 시뮬레이션 -->
+  <section class="card">
+    <h2><span class="step">6</span> 매장유형별 투자 시뮬레이션 <span class="tag">상담용 계산기</span></h2>
+    <p class="desc">숫자를 직접 수정하면 월 순수익·회수기간이 바로 다시 계산됩니다 — 상담 중 협의된 조건으로 바로 바꿔서 보여주세요. 상단 토글로 배달전문/홀+배달 강조도 전환됩니다.</p>
+    <div class="sim-grid">
+      <div class="sim-card" id="simDelivery">
+        <h4>🛵 배달전문 트랙</h4>
+        <div class="sim-input-row">
+          <label>투자비용(만원, 가맹비 포함)</label>
+          <input type="number" class="sim-input" data-track="delivery" data-field="invest" value="3100">
+        </div>
+        <div class="sim-input-row">
+          <label>예상 월매출(만원)</label>
+          <input type="number" class="sim-input" data-track="delivery" data-field="sales" value="2400">
+        </div>
+        <div class="sim-input-row">
+          <label>순수익비율(%)</label>
+          <input type="number" class="sim-input" data-track="delivery" data-field="margin" value="20">
+        </div>
+        <div class="sim-result">
+          <div class="sim-result-item"><span>월 순수익</span><b id="simDeliveryProfit">-</b></div>
+          <div class="sim-result-item"><span>투자금 회수기간</span><b id="simDeliveryPayback">-</b></div>
+        </div>
+        <div class="row"><span>핵심 변수</span><b>배달권역 세대수 · 오토바이 접근성</b></div>
+        <button type="button" class="sim-reset-btn" onclick="resetSimTrack('delivery')">기본값(예시)으로 초기화</button>
+      </div>
+      <div class="sim-card active" id="simHall">
+        <h4>🏠 홀+배달 트랙</h4>
+        <div class="sim-input-row">
+          <label>투자비용(만원)</label>
+          <input type="number" class="sim-input" data-track="hall" data-field="invest" value="7530">
+        </div>
+        <div class="sim-input-row">
+          <label>예상 월매출(만원)</label>
+          <input type="number" class="sim-input" data-track="hall" data-field="sales" value="3200">
+        </div>
+        <div class="sim-input-row">
+          <label>순수익비율(%)</label>
+          <input type="number" class="sim-input" data-track="hall" data-field="margin" value="20">
+        </div>
+        <div class="sim-result">
+          <div class="sim-result-item"><span>월 순수익</span><b id="simHallProfit">-</b></div>
+          <div class="sim-result-item"><span>투자금 회수기간</span><b id="simHallPayback">-</b></div>
+        </div>
+        <div class="row"><span>핵심 변수</span><b>유동인구 · 좌석수 · 임대시세</b></div>
+        <button type="button" class="sim-reset-btn" onclick="resetSimTrack('hall')">기본값(예시)으로 초기화</button>
+      </div>
+    </div>
+    <p class="map-note">※ 기본값은 M2·M4 자료 기준 예시입니다. 투자비용에는 가맹비·인테리어 등 항목별 협의금액이 다를 수 있으니 실제 상담 시 확정 금액으로 바꿔서 사용하세요.</p>
+  </section>
+
+  <!-- 7. 종합 스코어 -->
+  <section class="card">
+    <h2><span class="step">7</span> 종합 스코어 (현장답사 7문항 체크리스트)</h2>
+    <p class="desc">항목별 5점 만점 — 예시 채점</p>
+    <div class="score-list">
+      <div class="score-row"><span>① 매장규모·좌석수</span><div class="meter-track"><div class="meter-fill" style="width:80%"></div></div><span>4/5</span></div>
+      <div class="score-row"><span>② 대기줄·주문비중</span><div class="meter-track"><div class="meter-fill" style="width:60%"></div></div><span>3/5</span></div>
+      <div class="score-row"><span>③ 가격·메뉴구성</span><div class="meter-track"><div class="meter-fill" style="width:80%"></div></div><span>4/5</span></div>
+      <div class="score-row"><span>④ 유동인구·경쟁분포</span><div class="meter-track"><div class="meter-fill" style="width:60%"></div></div><span>3/5</span></div>
+      <div class="score-row"><span>⑤ 리뷰·평점 추이</span><div class="meter-track"><div class="meter-fill" style="width:80%"></div></div><span>4/5</span></div>
+      <div class="score-row"><span>⑥ 임대시세·공실</span><div class="meter-track"><div class="meter-fill" style="width:60%"></div></div><span>3/5</span></div>
+      <div class="score-row"><span>⑦ 배후세대유형</span><div class="meter-track"><div class="meter-fill" style="width:80%"></div></div><span>4/5</span></div>
+    </div>
+    <div class="score-total">
+      <span style="font-size:13px;color:var(--ink-secondary)">총점 (35점 만점)</span>
+      <span class="num">25점 <span style="font-size:14px;color:var(--ink-muted);font-weight:500">· 상위 40% 수준 입지 (예시)</span></span>
+    </div>
+  </section>
+
+  <div class="disclaimer">
+    ※ 본 문서는 <b>상권분석 보고서 양식 목업</b>입니다. 표시된 주소·매출·경쟁점·점수는 레이아웃 확인용 예시 데이터이며, 실제 수치가 아닙니다.<br>
+    ※ 실제 서비스 단계에서는 주소 입력 시 카카오맵 API(지오코딩·지도·경쟁점 검색) + 공공데이터포털(소상공인시장진흥공단 상가정보·우리마을가게 상권분석서비스) 연동으로 이 리포트가 자동 생성됩니다.<br>
+    ※ 매출 관련 수치는 추정치이며 실제 매출과 차이가 있을 수 있습니다 — 상담 시 과장 표현 없이 "평균치·변동 가능" 명시 원칙 준수.
+  </div>
+
+</div>
+</div>
+
+<script>
+  function toggleTheme() {
+    const root = document.documentElement;
+    const current = root.getAttribute('data-theme');
+    if (current === 'dark') { root.removeAttribute('data-theme'); }
+    else { root.setAttribute('data-theme', 'dark'); }
+  }
+
+  let kakaoOverlays = null;   // { rings: [Circle...], polygon: Polygon } — 배달전문/홀+배당 토글에서 재사용
+  let kakaoMapInstance = null; // 지도 인스턴스 재사용 (주소 재검색 시 새로 안 만듦)
+  let kakaoMarkers = [];      // CustomOverlay 목록 — 재검색 시 지우고 다시 그림
+  let categoryMarkers = [];   // 3번 섹션 업종 키워드 검색으로 찍은 마커 — 별도 관리
+  let currentAnalysisCenter = null; // 마지막으로 분석한 위치(kakao.maps.LatLng) — 3번 섹션 검색 기준점
+
+  // 3번 섹션 표의 업종명과 매칭되는 키워드 (mock 데이터 — 실제 매출 API 없어 예시로 유지)
+  const CATEGORY_SALES_MAP = [
+    { rowId: 'catRow-분식', keywords: ['분식', '떡볶이', '순대', '튀김'], sales: 3200 },
+    { rowId: 'catRow-카페디저트', keywords: ['카페', '디저트', '커피', '베이커리'], sales: 2800 },
+    { rowId: 'catRow-치킨피자', keywords: ['치킨', '피자', '버거', '햄버거'], sales: 4100 },
+    { rowId: 'catRow-편의점', keywords: ['편의점'], sales: 1900 },
+  ];
+
+  function matchCategorySales(keyword) {
+    const lower = keyword.trim();
+    return CATEGORY_SALES_MAP.find((c) => c.keywords.some((k) => lower.includes(k))) || null;
+  }
+
+  // 배달권역 폴리곤의 "모양"을 대상지 기준 상대좌표(위도차, 경도차)로 고정해두고,
+  // 어떤 주소가 들어와도 그 지점 중심으로 같은 모양을 다시 그린다 (실제 도로기반 계산 전까지의 근사치)
+  const DELIVERY_ZONE_DELTAS = [
+    [0.0135, 0.0000], [0.0100, 0.0110], [0.0000, 0.0160], [-0.0090, 0.0130],
+    [-0.0130, 0.0020], [-0.0100, -0.0090], [-0.0020, -0.0140], [0.0090, -0.0100]
+  ];
+  const COMPETITOR_BRANDS = ['신전떡볶이', '동대문엽기떡볶이', '우리할매떡볶이', '스텔라떡볶이'];
+
+  function toggleKeyVisibility(inputId, eyeBtn) {
+    const input = document.getElementById(inputId);
+    const eye = eyeBtn;
+    if (input.type === 'password') {
+      input.type = 'text';
+      eye.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      eye.textContent = '👁';
+    }
+  }
+
+  function applyKakaoKey() {
+    const key = document.getElementById('kakaoKeyInput').value.trim();
+    const status = document.getElementById('kakaoKeyStatus');
+    if (!key) {
+      status.textContent = '키를 입력해주세요.';
+      status.className = 'kakao-key-status err';
+      return;
+    }
+    status.textContent = '지도 불러오는 중...';
+    status.className = 'kakao-key-status';
+
+    const script = document.createElement('script');
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&libraries=services&autoload=false`;
+    script.onerror = () => {
+      status.textContent = '스크립트 로드 실패 — 키 값 또는 네트워크 연결을 확인하세요.';
+      status.className = 'kakao-key-status err';
+    };
+    script.onload = () => {
+      try {
+        kakao.maps.load(() => {
+          try {
+            initKakaoMap();
+            status.textContent = '✓ 실제 지도로 전환됨';
+            status.className = 'kakao-key-status ok';
+          } catch (e) {
+            status.textContent = '지도 초기화 오류: ' + e.message;
+            status.className = 'kakao-key-status err';
+          }
+        });
+      } catch (e) {
+        status.textContent = '카카오 SDK 로드 오류 — 도메인 등록을 확인하세요 (지도 하단 안내 참고).';
+        status.className = 'kakao-key-status err';
+      }
+    };
+    document.head.appendChild(script);
+  }
+
+  function addLabeledMarker(map, lat, lng, label, color, trackArray) {
+    const pos = new kakao.maps.LatLng(lat, lng);
+    const content = document.createElement('div');
+    content.style.cssText = 'display:flex;flex-direction:column;align-items:center;';
+    content.innerHTML =
+      `<div style="width:12px;height:12px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.2)"></div>
+       <div style="margin-top:3px;font-size:11px;background:#fff;color:#0b0b0b;padding:1px 6px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.25);white-space:nowrap;">${label}</div>`;
+    const overlay = new kakao.maps.CustomOverlay({ position: pos, content, yAnchor: 1, xAnchor: 0.5 });
+    overlay.setMap(map);
+    (trackArray || kakaoMarkers).push(overlay);
+    return overlay;
+  }
+
+  function clearKakaoOverlays() {
+    if (kakaoOverlays) {
+      kakaoOverlays.rings.forEach(r => r.setMap(null));
+      kakaoOverlays.polygon.setMap(null);
+      kakaoOverlays = null;
+    }
+    kakaoMarkers.forEach(m => m.setMap(null));
+    kakaoMarkers = [];
+  }
+
+  function clearCategoryMarkers() {
+    categoryMarkers.forEach(m => m.setMap(null));
+    categoryMarkers = [];
+  }
+
+  // center(kakao.maps.LatLng) 기준으로 지도를 (다시) 그린다 — 최초 로드와 주소 재검색 양쪽에서 공용으로 씀
+  function renderMapData(center, targetLabel, competitors) {
+    document.getElementById('mockMapSvg').style.display = 'none';
+    document.querySelector('.map-badge').style.display = 'none';
+    const mapDiv = document.getElementById('kakaoMapDiv');
+    mapDiv.style.display = 'block';
+
+    if (!kakaoMapInstance) {
+      kakaoMapInstance = new kakao.maps.Map(mapDiv, { center, level: 5 });
+    } else {
+      kakaoMapInstance.setCenter(center);
+    }
+    const map = kakaoMapInstance;
+    clearKakaoOverlays();
+    clearCategoryMarkers(); // 위치가 바뀌면 이전 업종검색 마커는 더 이상 유효하지 않음
+    currentAnalysisCenter = center;
+
+    const rings = [300, 500, 1000].map(r => {
+      const circle = new kakao.maps.Circle({
+        center, radius: r, strokeWeight: 1.4, strokeColor: '#898781', strokeOpacity: 0.7,
+        strokeStyle: 'shortdash', fillColor: '#000000', fillOpacity: 0
+      });
+      circle.setMap(map);
+      return circle;
+    });
+
+    const lat = center.getLat(), lng = center.getLng();
+    const path = DELIVERY_ZONE_DELTAS.map(([dlat, dlng]) => new kakao.maps.LatLng(lat + dlat, lng + dlng));
+    const polygon = new kakao.maps.Polygon({
+      path, strokeWeight: 2, strokeColor: '#4f8892', strokeOpacity: 0.85, strokeStyle: 'longdash',
+      fillColor: '#4f8892', fillOpacity: 0.18
+    });
+    polygon.setMap(map);
+
+    kakaoOverlays = { rings, polygon };
+
+    addLabeledMarker(map, lat, lng, targetLabel, '#3d6d76');
+    competitors.forEach(c => {
+      const label = c.distance_m != null ? `${c.brand} ${c.distance_m}m` : c.brand;
+      addLabeledMarker(map, c.lat, c.lng, label, '#ec835a');
+    });
+
+    const activeType = document.querySelector('#typeToggle button.active').dataset.type;
+    applyKakaoEmphasis(activeType);
+  }
+
+  function initKakaoMap() {
+    const data = JSON.parse(document.getElementById('report-data').textContent);
+    const center = new kakao.maps.LatLng(data.target.lat, data.target.lng);
+    renderMapData(center, data.target.label, data.competitors);
+  }
+
+  // --- 주소 검색 (카카오 지오코딩 + 경쟁 브랜드 키워드검색, 전부 클라이언트에서 실행) ---
+
+  function kakaoGeocode(address) {
+    return new Promise((resolve, reject) => {
+      new kakao.maps.services.Geocoder().addressSearch(address, (result, status) => {
+        console.log('[kakaoGeocode] addressSearch status:', status, 'result count:', result && result.length);
+        if (status === kakao.maps.services.Status.OK && result.length) {
+          resolve(result[0]);
+          return;
+        }
+        // 도로명주소 문자열 그대로는 못 찾는 경우가 있어(예: "(동명)" 참고항목 포함 표기 등)
+        // 키워드검색으로 좌표를 먼저 찾고, 그 좌표를 다시 주소로 역변환하는 방식으로 한 번 더 시도한다.
+        new kakao.maps.services.Places().keywordSearch(address, (data, kwStatus) => {
+          console.log('[kakaoGeocode] fallback keywordSearch status:', kwStatus, 'result count:', data && data.length);
+          if (kwStatus === kakao.maps.services.Status.OK && data.length) {
+            const x = data[0].x, y = data[0].y;
+            new kakao.maps.services.Geocoder().coord2Address(x, y, (addrResult, addrStatus) => {
+              console.log('[kakaoGeocode] fallback coord2Address status:', addrStatus);
+              if (addrStatus === kakao.maps.services.Status.OK && addrResult.length) {
+                const a = addrResult[0];
+                resolve({
+                  x, y,
+                  address_name: (a.road_address && a.road_address.address_name) || (a.address && a.address.address_name) || address,
+                  address: a.address,
+                });
+              } else {
+                reject(new Error(`주소를 찾을 수 없습니다 (상태: ${status}/${kwStatus}/${addrStatus}) — 이 오류가 계속되면 카카오 디벨로퍼스에 등록된 "플랫폼 Web 도메인"과 지금 이 파일을 열고 있는 주소(브라우저 주소창)가 일치하는지 확인해주세요. file://로 직접 연 경우 도메인 인식이 안 되어 지오코딩이 막힐 수 있습니다.`));
+              }
+            });
+          } else {
+            reject(new Error(`주소를 찾을 수 없습니다 (상태: ${status}/${kwStatus}) — 이 오류가 계속되면 카카오 디벨로퍼스에 등록된 "플랫폼 Web 도메인"과 지금 이 파일을 열고 있는 주소(브라우저 주소창)가 일치하는지 확인해주세요. file://로 직접 연 경우 도메인 인식이 안 되어 지오코딩이 막힐 수 있습니다.`));
+          }
+        });
+      });
+    });
+  }
+
+  function kakaoPlacesSearch(keyword, center, radius) {
+    return new Promise((resolve) => {
+      new kakao.maps.services.Places().keywordSearch(keyword, (data, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          resolve(data.map(d => ({
+            brand: keyword,
+            place_name: d.place_name,
+            road_address: d.road_address_name || d.address_name,
+            distance_m: d.distance ? parseInt(d.distance, 10) : null,
+            lat: parseFloat(d.y),
+            lng: parseFloat(d.x),
+          })));
+        } else {
+          resolve([]);
+        }
+      }, { location: center, radius, sort: kakao.maps.services.SortBy.DISTANCE });
+    });
+  }
+
+  async function searchCompetitorsNear(center) {
+    const results = await Promise.all(COMPETITOR_BRANDS.map(b => kakaoPlacesSearch(b, center, 1000)));
+    const flat = results.flat();
+    const seen = new Set();
+    const dedup = [];
+    flat.forEach(c => {
+      const key = c.place_name + '|' + c.lat + '|' + c.lng;
+      if (!seen.has(key)) { seen.add(key); dedup.push(c); }
+    });
+    dedup.sort((a, b) => (a.distance_m ?? 9999) - (b.distance_m ?? 9999));
+    return dedup;
+  }
+
+  function renderCompetitorTable(competitors) {
+    const tbody = document.getElementById('competitorRows');
+    if (!competitors.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--ink-muted);padding:16px;">반경 1km 내 검색된 경쟁 브랜드가 없습니다.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = competitors.map(c => `
+      <tr>
+        <td>${c.brand}${c.place_name && c.place_name !== c.brand ? ` <span style="color:var(--ink-muted);font-size:11.5px;">(${c.place_name})</span>` : ''}</td>
+        <td>${c.distance_m != null ? c.distance_m + 'm' : '-'}</td>
+        <td style="color:var(--ink-muted);font-size:12px;">데이터 연동 예정</td>
+        <td style="color:var(--ink-muted);">-</td>
+        <td style="color:var(--ink-muted);">-</td>
+      </tr>`).join('');
+    document.getElementById('competitorTableNote').textContent =
+      '※ 카카오맵 실검색 결과입니다(위치·거리는 실데이터). 매출·리뷰·배달비중은 아직 연동 전이라 표시하지 않습니다 — 실제 수치가 아닌 값을 실제 매장명 옆에 표시하지 않기 위한 조치입니다.';
+  }
+
+  // --- 3번 섹션: 업종/브랜드 키워드 검색 → 2번 지도에 마커 + 업종평균(예시) 배지로 표시 ---
+  function highlightCategoryRow(rowId) {
+    document.querySelectorAll('#salesCategoryTable tbody tr').forEach(tr => tr.classList.remove('highlight'));
+    if (rowId) {
+      const row = document.getElementById(rowId);
+      if (row) row.classList.add('highlight');
+    }
+  }
+
+  async function runCategorySearch() {
+    const keyword = document.getElementById('categoryKeywordInput').value.trim();
+    const status = document.getElementById('categorySearchStatus');
+
+    if (!keyword) { status.textContent = '키워드를 입력해주세요.'; status.className = 'kakao-key-status err'; return; }
+    if (typeof kakao === 'undefined' || !kakao.maps || !kakao.maps.services) {
+      status.textContent = '지도가 아직 준비되지 않았습니다 — 2번 지도 섹션에서 카카오 키를 먼저 적용해주세요.';
+      status.className = 'kakao-key-status err';
+      return;
+    }
+    if (!currentAnalysisCenter) {
+      status.textContent = '먼저 상단에서 주소 분석을 1회 실행해주세요 (검색 기준 위치가 필요합니다).';
+      status.className = 'kakao-key-status err';
+      return;
+    }
+
+    status.textContent = '검색 중...';
+    status.className = 'kakao-key-status';
+
+    const results = await kakaoPlacesSearch(keyword, currentAnalysisCenter, 1000);
+    const match = matchCategorySales(keyword);
+    highlightCategoryRow(match ? match.rowId : null);
+
+    clearCategoryMarkers();
+    const map = kakaoMapInstance;
+    results.forEach(r => {
+      const badge = match ? ` · 업종평균 ${match.sales.toLocaleString('ko-KR')}만원(예시)` : '';
+      const label = `${r.place_name}${r.distance_m != null ? ' ' + r.distance_m + 'm' : ''}${badge}`;
+      addLabeledMarker(map, r.lat, r.lng, label, 'var(--seq-450)', categoryMarkers);
+    });
+
+    if (!results.length) {
+      status.textContent = `반경 1km 내 "${keyword}" 검색 결과가 없습니다.`;
+      status.className = 'kakao-key-status err';
+      return;
+    }
+    status.textContent = match
+      ? `✓ ${results.length}건 지도에 표시 — 업종평균 추정 ${match.sales.toLocaleString('ko-KR')}만원(예시) 배지 포함`
+      : `✓ ${results.length}건 지도에 표시 (일치하는 업종 평균 예시 데이터 없음)`;
+    status.className = 'kakao-key-status ok';
+  }
+
+  async function runAddressSearch() {
+    const address = document.getElementById('addrInput').value.trim();
+    const status = document.getElementById('addrStatus');
+
+    if (!address) { status.textContent = '주소를 입력해주세요.'; status.className = 'addr-status err'; return; }
+    if (typeof kakao === 'undefined' || !kakao.maps || !kakao.maps.services) {
+      status.textContent = '지도가 아직 준비되지 않았습니다 — 지도 섹션에서 카카오 키를 먼저 적용해주세요.';
+      status.className = 'addr-status err';
+      return;
+    }
+
+    status.textContent = '주소 검색 중...';
+    status.className = 'addr-status';
+
+    try {
+      const geo = await kakaoGeocode(address);
+      const center = new kakao.maps.LatLng(parseFloat(geo.y), parseFloat(geo.x));
+
+      document.getElementById('addrInput').value = geo.address_name;
+      document.getElementById('regionDongValue').textContent = geo.address ? geo.address.region_3depth_name || '-' : '-';
+      document.getElementById('regionDongFoot').textContent = geo.address ? `${geo.address.region_1depth_name} ${geo.address.region_2depth_name}` : '';
+
+      // 진입유형/인구/경쟁매장(시군구)은 전국매장지도 원본 데이터가 있어야 계산 가능 — 새 주소에는 아직 값 없음을 명시
+      document.getElementById('entryTypeMeta').textContent = '미확인(수동 확인 필요)';
+      document.getElementById('entryTypeValue').textContent = '미확인';
+      document.getElementById('entryTypeFoot').textContent = '원본 데이터 필요';
+      document.getElementById('populationValue').textContent = '미확인';
+      document.getElementById('populationFoot').textContent = '원본 데이터 필요';
+      document.getElementById('competitorCountValue').textContent = '미확인';
+      document.getElementById('competitorCountFoot').textContent = '원본 데이터 필요';
+
+      status.textContent = '경쟁 브랜드 검색 중...';
+      const competitors = await searchCompetitorsNear(center);
+
+      renderMapData(center, '출점후보지', competitors);
+      renderCompetitorTable(competitors);
+
+      status.textContent = `✓ 완료 — 반경 1km 경쟁 브랜드 ${competitors.length}건 발견`;
+      status.className = 'addr-status ok';
+    } catch (e) {
+      status.textContent = e.message || '검색 중 오류가 발생했습니다.';
+      status.className = 'addr-status err';
+    }
+  }
+
+  // --- 도로명주소 API(행정안전부, juso.go.kr) 검색 API — 동/도로명 목록 검색 ---
+  // ※ 팝업API(addrLinkUrl.do)는 선택 결과를 "돌려주는 방식"이 서버가 있어야 처리 가능한
+  //   POST 리턴 방식이라, 서버 없는 이 정적 파일 구조에서는 결과가 부모창에 전달되지 않는다
+  //   (실제 테스트로 확인됨). 그래서 결과를 JSON으로 바로 돌려주는 "검색 API"
+  //   (addrLinkApi.do, CORS 전체 허용 확인됨)를 브라우저에서 직접 fetch로 호출하는 방식으로 전환.
+  //   ⚠ 이 API는 팝업API와는 "다른 종류의 승인키"가 필요하다(같은 키를 쓰면 "등록되지 않은 KEY" 오류) —
+  //   business.juso.go.kr에서 "도로명주소 > 검색 API" 카드로 별도 신청 필요.
+  async function runJusoSearch() {
+    const key = document.getElementById('jusoKeyInput').value.trim();
+    const keyword = document.getElementById('addrInput').value.trim();
+    const status = document.getElementById('addrStatus');
+    const list = document.getElementById('addrSuggestList');
+    list.classList.remove('open');
+    list.innerHTML = '';
+
+    if (!key) {
+      status.textContent = '도로명주소 검색 API 승인키를 먼저 입력해주세요 (2번 지도 섹션 하단 입력창).';
+      status.className = 'addr-status err';
+      return;
+    }
+    if (!keyword) {
+      status.textContent = '검색할 동/도로명을 입력해주세요.';
+      status.className = 'addr-status err';
+      return;
+    }
+
+    status.textContent = '주소 검색 중...';
+    status.className = 'addr-status';
+
+    try {
+      const url = 'https://www.juso.go.kr/addrlink/addrLinkApi.do?' + new URLSearchParams({
+        confmKey: key, currentPage: '1', countPerPage: '10', keyword, resultType: 'json'
+      }).toString();
+      const resp = await fetch(url);
+      const data = await resp.json();
+      const common = data.results && data.results.common;
+
+      if (common && common.errorCode && common.errorCode !== '0') {
+        status.textContent = `검색 API 오류: ${common.errorMessage || common.errorCode} — 이 키가 "검색 API"용으로 발급된 키인지 확인해주세요(팝업API 키와는 다른 키입니다).`;
+        status.className = 'addr-status err';
+        return;
+      }
+
+      const results = (data.results && data.results.juso) || [];
+      if (results.length === 0) {
+        status.textContent = '검색 결과가 없습니다 — 동/도로명을 다르게 입력해보세요.';
+        status.className = 'addr-status err';
+        return;
+      }
+
+      results.forEach((r) => {
+        const item = document.createElement('div');
+        item.className = 'addr-suggest-item';
+        item.innerHTML = `<div class="addr-main">${r.roadAddr || ''}</div><div class="addr-sub">${r.jibunAddr || ''} · ${r.zipNo || ''}</div>`;
+        item.onclick = () => {
+          // roadAddrPart1(참고항목 "(동명)" 없는 순수 도로명주소)를 넣어야 카카오 지오코딩이 더 안정적으로 인식한다.
+          document.getElementById('addrInput').value = r.roadAddrPart1 || r.roadAddr;
+          list.classList.remove('open');
+          runAddressSearch();
+        };
+        list.appendChild(item);
+      });
+      list.classList.add('open');
+      status.textContent = `✓ ${results.length}건 검색됨 — 목록에서 주소를 선택하세요.`;
+      status.className = 'addr-status ok';
+    } catch (e) {
+      status.textContent = '검색 중 오류가 발생했습니다: ' + (e.message || '');
+      status.className = 'addr-status err';
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const list = document.getElementById('addrSuggestList');
+    if (list && !e.target.closest('.addr-suggest')) list.classList.remove('open');
+  });
+
+  function applyKakaoEmphasis(type) {
+    if (!kakaoOverlays) return;
+    if (type === 'delivery') {
+      kakaoOverlays.polygon.setOptions({ fillOpacity: 0.32 });
+      kakaoOverlays.rings.forEach(r => r.setOptions({ strokeOpacity: 0.25 }));
+    } else {
+      kakaoOverlays.polygon.setOptions({ fillOpacity: 0.16 });
+      kakaoOverlays.rings.forEach(r => r.setOptions({ strokeOpacity: 0.7 }));
+    }
+  }
+
+  function setStoreType(type) {
+    document.querySelectorAll('#typeToggle button').forEach(b => {
+      b.classList.toggle('active', b.dataset.type === type);
+    });
+    const tag = document.getElementById('mapModeTag');
+    const deliveryZone = document.getElementById('deliveryZone');
+    const rings = [document.getElementById('ring300'), document.getElementById('ring500'), document.getElementById('ring1000')];
+    const simDelivery = document.getElementById('simDelivery');
+    const simHall = document.getElementById('simHall');
+
+    if (type === 'delivery') {
+      tag.textContent = '배달전문 모드';
+      deliveryZone.setAttribute('opacity', '0.30');
+      rings.forEach(r => r.setAttribute('opacity', '0.25'));
+      simDelivery.classList.add('active');
+      simHall.classList.remove('active');
+    } else {
+      tag.textContent = '홀+배달 모드';
+      deliveryZone.setAttribute('opacity', '0.16');
+      rings[0].setAttribute('opacity', '0.8');
+      rings[1].setAttribute('opacity', '0.55');
+      rings[2].setAttribute('opacity', '0.35');
+      simHall.classList.add('active');
+      simDelivery.classList.remove('active');
+    }
+    applyKakaoEmphasis(type);
+  }
+
+  // --- 6번 섹션: 상담용 투자 시뮬레이션 계산기 ---
+  const SIM_DEFAULTS = {
+    delivery: { invest: 3100, sales: 2400, margin: 20 },
+    hall: { invest: 7530, sales: 3200, margin: 20 },
+  };
+
+  function formatMonths(months) {
+    if (!isFinite(months) || months <= 0) return '-';
+    if (months >= 12) {
+      const y = Math.floor(months / 12);
+      const m = Math.round(months % 12);
+      return m > 0 ? `약 ${y}년 ${m}개월` : `약 ${y}년`;
+    }
+    return `약 ${months.toFixed(1)}개월`;
+  }
+
+  function computeSim(track) {
+    const get = (field) => parseFloat(document.querySelector(`.sim-input[data-track="${track}"][data-field="${field}"]`).value);
+    const invest = get('invest') || 0;
+    const sales = get('sales') || 0;
+    const margin = get('margin') || 0;
+    const profit = sales * margin / 100;
+    const idBase = track === 'delivery' ? 'simDelivery' : 'simHall';
+    document.getElementById(idBase + 'Profit').textContent = profit > 0 ? `${profit.toLocaleString('ko-KR', { maximumFractionDigits: 0 })}만원` : '-';
+    document.getElementById(idBase + 'Payback').textContent = profit > 0 && invest > 0 ? formatMonths(invest / profit) : '-';
+  }
+
+  function resetSimTrack(track) {
+    const d = SIM_DEFAULTS[track];
+    document.querySelector(`.sim-input[data-track="${track}"][data-field="invest"]`).value = d.invest;
+    document.querySelector(`.sim-input[data-track="${track}"][data-field="sales"]`).value = d.sales;
+    document.querySelector(`.sim-input[data-track="${track}"][data-field="margin"]`).value = d.margin;
+    computeSim(track);
+  }
+
+  document.querySelectorAll('.sim-input').forEach((inp) => {
+    inp.addEventListener('input', () => computeSim(inp.dataset.track));
+  });
+  computeSim('delivery');
+  computeSim('hall');
+
+  // 파일에 키가 이미 저장되어 있으면 페이지를 열 때 자동으로 실제 지도를 띄운다
+  if (document.getElementById('kakaoKeyInput').value.trim()) {
+    applyKakaoKey();
+  }
+</script>
+</body>
+</html>
