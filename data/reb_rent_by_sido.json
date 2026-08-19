@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-08-19T23:23:30Z",
+  "quarterDesc": "2026년 2분기",
+  "bySido": {
+    "서울특별시": {
+      "perM2Thousand": 52.78,
+      "perPyeongWon": 174472
+    },
+    "부산광역시": {
+      "perM2Thousand": 26.33,
+      "perPyeongWon": 87052
+    },
+    "대구광역시": {
+      "perM2Thousand": 20.55,
+      "perPyeongWon": 67948
+    },
+    "인천광역시": {
+      "perM2Thousand": 21.36,
+      "perPyeongWon": 70615
+    },
+    "광주광역시": {
+      "perM2Thousand": 16.66,
+      "perPyeongWon": 55090
+    },
+    "대전광역시": {
+      "perM2Thousand": 15.08,
+      "perPyeongWon": 49858
+    },
+    "울산광역시": {
+      "perM2Thousand": 14.02,
+      "perPyeongWon": 46343
+    },
+    "세종특별자치시": {
+      "perM2Thousand": 15.83,
+      "perPyeongWon": 52334
+    },
+    "경기도": {
+      "perM2Thousand": 23.91,
+      "perPyeongWon": 79047
+    },
+    "강원도": {
+      "perM2Thousand": 13.31,
+      "perPyeongWon": 43987
+    },
+    "충청북도": {
+      "perM2Thousand": 12.6,
+      "perPyeongWon": 41665
+    },
+    "충청남도": {
+      "perM2Thousand": 12.9,
+      "perPyeongWon": 42647
+    },
+    "전라북도": {
+      "perM2Thousand": 10.85,
+      "perPyeongWon": 35869
+    },
+    "전라남도": {
+      "perM2Thousand": 10.86,
+      "perPyeongWon": 35891
+    },
+    "경상북도": {
+      "perM2Thousand": 13.1,
+      "perPyeongWon": 43305
+    },
+    "경상남도": {
+      "perM2Thousand": 13.01,
+      "perPyeongWon": 43003
+    },
+    "제주특별자치도": {
+      "perM2Thousand": 14.78,
+      "perPyeongWon": 48865
+    }
+  }
+}
