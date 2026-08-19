@@ -262,6 +262,12 @@
     position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.55); color: #fff;
     font-size: 11px; padding: 4px 9px; border-radius: 999px; z-index: 5;
   }
+  .sbiz-block { margin-top: 18px; }
+  .sbiz-wrap {
+    position: relative; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface-1); height: 640px;
+    display: flex; align-items: center; justify-content: center;
+  }
 
   .kakao-key-bar {
     display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
@@ -433,6 +439,7 @@
     .addr-box .addr-note { display: none; }
     .map-badge { display: none; }
     .roadview-block { display: none !important; }
+    .sbiz-block { display: none !important; }
     .report-shell { max-width: 100%; padding: 0; }
     section.card {
       box-shadow: none !important; border: 1px solid #ccc;
@@ -571,6 +578,14 @@
           <span id="dataGoKrKeyStatus" class="kakao-key-status"></span>
         </div>
         <p class="map-note">※ 이 저장소는 Public이라 이 키는 파일(코드)에는 저장해두지 않았습니다 — 키를 입력하면 "반경 1km 내 음식업종 전체"(1번 지역개요)와 "인근 상업용 부동산 실거래가"(1번 지역개요) 두 수치를 모두 이 하나의 키로 실시간 조회합니다(공공데이터포털은 같은 계정 키를 여러 API에 공용으로 쓸 수 있습니다). 대신 이 브라우저의 로컬 저장소(localStorage)에 남겨두어, 한 번 입력하면 이 브라우저·이 컴퓨터에서는 새로고침해도 다시 입력할 필요 없습니다(다른 브라우저·기기·시크릿모드에서는 다시 입력 필요, 저장소 코드에는 절대 올라가지 않음). data.go.kr에서 받은 "Encoding" 값을 그대로 붙여넣어주세요.</p>
+
+        <div class="kakao-key-bar">
+          <input type="password" id="sbizCertKeyInput" value=""
+                 placeholder="소상공인365 오픈API certKey — 배달분석(행정동 단위 배달매출 등급) 위젯용 (bigdata.sbiz.or.kr, 선택 입력 — Public 저장소라 키는 코드에 저장하지 않음)">
+          <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('sbizCertKeyInput', this)" title="키 보기/가리기">👁</button>
+          <span id="sbizCertKeyStatus" class="kakao-key-status"></span>
+        </div>
+        <p class="map-note">※ 이 키도 Public 저장소라 파일(코드)에는 저장하지 않았습니다 — 입력하면 이 브라우저의 localStorage에만 남고, 아래 "배달 경쟁 등급" 패널에 소상공인365(소상공인시장진흥공단)의 배달분석 화면을 그대로 불러옵니다. 소상공인365에 정식으로 오픈API를 신청해 발급받은 certKey를 입력해주세요(신청: 소상공인365 → 이용안내 → 개방·활용 → 오픈 API 신청, 로그인 필요).</p>
       </div>
     </details>
 
@@ -636,6 +651,15 @@
         <div id="kakaoRoadviewDiv" style="width:100%;height:100%;"></div>
       </div>
       <p class="map-note">※ 카카오맵이 실제로 촬영한 지점에서만 제공되는 기능이라, 촬영 이력이 없는 위치는 "로드뷰 데이터가 없습니다"로 표시될 수 있습니다.</p>
+    </div>
+
+    <div class="sbiz-block" id="sbizBlock">
+      <div class="roadview-title">🛵 배달 경쟁 등급 — 소상공인365 (행정동·업종 단위)</div>
+      <div class="sbiz-wrap" id="sbizWrap">
+        <div class="roadview-badge" id="sbizBadge">위 "⚙ API 키 설정"에서 소상공인365 certKey를 입력하면 표시됩니다</div>
+        <iframe id="sbizIframe" title="소상공인365 배달분석" style="display:none;width:100%;height:100%;border:0;"></iframe>
+      </div>
+      <p class="map-note">※ 소상공인365(소상공인시장진흥공단) 자체 화면을 그대로 불러온 것으로, 위젯 안에서 시도·시군구·업종을 직접 선택해 <b>행정동 단위</b> 배달 매출 등급(빨강=낮음~파랑=높음)을 확인할 수 있습니다. 이 대시보드의 분석 주소와 자동으로 연동되지는 않으며(외부 사이트라 위치 전달 불가), 특정 매장 실명에 결부된 수치가 아니라 동네·업종 단위 집계이므로 우리가 임의로 추정한 값이 아니라 소상공인365가 직접 제공하는 데이터입니다.</p>
     </div>
   </section>
 
@@ -1309,6 +1333,50 @@
           window.localStorage.removeItem('sanggwon_dataGoKrKey');
         }
       } catch (e) { /* 무시 */ }
+    });
+  })();
+
+  // 소상공인365 "배달분석" 위젯 — certKey가 있으면 그 사이트 화면을 iframe으로 그대로 불러온다.
+  // 진입 경로는 반드시 "#/openApi/delivery"(그 다음 사이트 내부에서 "#/gis/openApi/delivery"로
+  // 재구성됨)여야 한다 — 처음부터 "#/gis/openApi/delivery"로 직접 열면 그 사이트 자체의 경로별
+  // 인증 체크(/pub/api/auth/menu/authentization?path=...)가 실패해 404가 뜨는 것을 iframe 테스트로 확인함.
+  function updateSbizIframe() {
+    const input = document.getElementById('sbizCertKeyInput');
+    const badge = document.getElementById('sbizBadge');
+    const iframe = document.getElementById('sbizIframe');
+    if (!input || !badge || !iframe) return;
+    const key = input.value.trim();
+    if (!key) {
+      iframe.style.display = 'none';
+      iframe.src = '';
+      badge.style.display = 'block';
+      badge.textContent = '위 "⚙ API 키 설정"에서 소상공인365 certKey를 입력하면 표시됩니다';
+      return;
+    }
+    badge.style.display = 'none';
+    iframe.style.display = 'block';
+    iframe.src = 'https://bigdata.sbiz.or.kr/#/openApi/delivery?certKey=' + encodeURIComponent(key);
+  }
+
+  // 이 certKey도 Public 저장소라 파일(코드)에는 저장하지 않고 이 브라우저의 localStorage에만 남긴다 —
+  // 위 공공데이터포털 키와 같은 패턴(재입력 없이 새로고침 유지, 다른 기기/시크릿모드는 별도 입력 필요).
+  (function initSbizCertKeyPersistence() {
+    const input = document.getElementById('sbizCertKeyInput');
+    if (!input) return;
+    try {
+      const saved = window.localStorage.getItem('sanggwon_sbizCertKey');
+      if (saved) input.value = saved;
+    } catch (e) { /* localStorage 접근 불가 환경에서는 조용히 무시 */ }
+    updateSbizIframe();
+    input.addEventListener('input', () => {
+      try {
+        if (input.value.trim()) {
+          window.localStorage.setItem('sanggwon_sbizCertKey', input.value.trim());
+        } else {
+          window.localStorage.removeItem('sanggwon_sbizCertKey');
+        }
+      } catch (e) { /* 무시 */ }
+      updateSbizIframe();
     });
   })();
 
