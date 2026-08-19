@@ -5,49 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>상권분석 보고서 양식 — 청년다방 가맹개발영업</title>
 <style>
+  /* v2.11 "다크 미스틱" — 기본 테마를 남색·보라 그라데이션 기반으로 전환(신비로운 톤).
+     라이트 모드는 이제 opt-in(data-theme="light")이고, 다크(미스틱)가 기본값이다.
+     인쇄/PDF는 항상 라이트로 강제 렌더링(아래 @media print에서 재정의). */
   .viz-root {
+    color-scheme: dark;
+    --surface-1:      #171335;
+    --page-plane:     #0b0a1c;
+    --ink-primary:    #f4f1ff;
+    --ink-secondary:  #bcaee3;
+    --ink-muted:      #8577ad;
+    --gridline:       #2c2657;
+    --baseline:       #3b3470;
+    --border:         rgba(196,163,255,0.16);
+    --seq-100: #cdbaff; --seq-250: #a78bfa; --seq-350: #8b5cf6;
+    --seq-400: #7c3aed; --seq-450: #6d28d9; --seq-550: #4c1d95;
+    --status-good: #34d399; --status-warning: #fbbf24;
+    --status-serious: #fb923c; --status-critical: #f87171;
+    --brand: #8b5cf6; --brand-strong: #a78bfa; --brand-tint: rgba(139,92,246,0.16);
+    --glow: rgba(167,139,250,0.45);
+  }
+  :root[data-theme="light"] .viz-root {
     color-scheme: light;
     --surface-1:      #fcfcfb;
-    --page-plane:     #f9f9f7;
-    --ink-primary:    #0b0b0b;
+    --page-plane:     #f7f5fc;
+    --ink-primary:    #17132b;
     --ink-secondary:  #52514e;
     --ink-muted:      #898781;
-    --gridline:       #e1e0d9;
+    --gridline:       #e1dcf0;
     --baseline:       #c3c2b7;
-    --border:         rgba(11,11,11,0.10);
-    --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-350: #5598e7;
-    --seq-400: #3987e5; --seq-450: #2a78d6; --seq-550: #1c5cab;
+    --border:         rgba(23,19,43,0.10);
+    --seq-100: #e6dcff; --seq-250: #c4aefc; --seq-350: #a78bfa;
+    --seq-400: #8b5cf6; --seq-450: #7c3aed; --seq-550: #5b21b6;
     --status-good: #0ca30c; --status-warning: #fab219;
     --status-serious: #ec835a; --status-critical: #d03b3b;
-    --brand: #4f8892; --brand-strong: #3d6d76; --brand-tint: #e7f0f0;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme="light"])) .viz-root {
-      color-scheme: dark;
-      --surface-1:      #1a1a19;
-      --page-plane:     #0d0d0d;
-      --ink-primary:    #ffffff;
-      --ink-secondary:  #c3c2b7;
-      --ink-muted:      #898781;
-      --gridline:       #2c2c2a;
-      --baseline:       #383835;
-      --border:         rgba(255,255,255,0.10);
-      --seq-400: #3987e5; --seq-450: #2a78d6; --seq-550: #184f95;
-      --brand: #6ca6af; --brand-strong: #86bcc4; --brand-tint: #1f3336;
-    }
-  }
-  :root[data-theme="dark"] .viz-root {
-    color-scheme: dark;
-    --surface-1:      #1a1a19;
-    --page-plane:     #0d0d0d;
-    --ink-primary:    #ffffff;
-    --ink-secondary:  #c3c2b7;
-    --ink-muted:      #898781;
-    --gridline:       #2c2c2a;
-    --baseline:       #383835;
-    --border:         rgba(255,255,255,0.10);
-    --seq-400: #3987e5; --seq-450: #2a78d6; --seq-550: #184f95;
-    --brand: #6ca6af; --brand-strong: #86bcc4; --brand-tint: #1f3336;
+    --brand: #7c3aed; --brand-strong: #5b21b6; --brand-tint: #ede6fb;
+    --glow: rgba(124,58,237,0.16);
   }
 
   * { box-sizing: border-box; }
@@ -56,10 +49,20 @@
     font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
   }
   .viz-root {
+    background:
+      radial-gradient(1100px 560px at 12% -8%, rgba(139,92,246,0.28), transparent 60%),
+      radial-gradient(900px 480px at 100% 0%, rgba(76,29,149,0.30), transparent 55%),
+      radial-gradient(700px 500px at 50% 110%, rgba(109,40,217,0.16), transparent 60%),
+      var(--page-plane);
+  }
+  :root[data-theme="light"] .viz-root {
+    background: var(--page-plane);
+  }
+  .viz-root {
     display: block;
     min-height: 100vh;
-    background: var(--page-plane);
     color: var(--ink-primary);
+    transition: background-color .2s, color .2s;
   }
   .report-shell {
     max-width: 980px;
@@ -78,11 +81,16 @@
   .theme-btn:hover { border-color: var(--brand); color: var(--brand-strong); }
 
   .header-bar {
-    background: linear-gradient(135deg, var(--brand-strong), var(--brand));
+    background: linear-gradient(135deg, #6d28d9, #a855f7 55%, #4c1d95);
     color: #fff;
     border-radius: 16px;
     padding: 22px 26px;
     display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end;
+    box-shadow: 0 10px 36px -10px rgba(139,92,246,0.55), 0 0 0 1px rgba(255,255,255,0.06) inset;
+  }
+  :root[data-theme="light"] .header-bar {
+    background: linear-gradient(135deg, var(--brand-strong), var(--brand));
+    box-shadow: 0 10px 28px -12px rgba(91,33,182,0.35);
   }
   .header-bar .eyebrow { font-size: 12px; letter-spacing: .06em; opacity: .85; text-transform: uppercase; }
   .header-bar h1 { margin: 4px 0 2px; font-size: 22px; }
@@ -143,7 +151,7 @@
     border: none; background: transparent; padding: 8px 16px; font-size: 13px; cursor: pointer;
     color: var(--ink-secondary); font-weight: 600;
   }
-  .type-toggle button.active { background: var(--brand); color: #fff; }
+  .type-toggle button.active { background: var(--brand); color: #fff; box-shadow: 0 0 16px -2px var(--glow); }
 
   .brand-title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .brand-title-row h1 { margin: 0; }
@@ -155,7 +163,7 @@
     border: none; background: transparent; padding: 6px 14px; font-size: 13px; cursor: pointer;
     color: var(--ink-secondary); font-weight: 600;
   }
-  .brand-toggle button.active { background: var(--brand-strong); color: #fff; }
+  .brand-toggle button.active { background: var(--brand-strong); color: #fff; box-shadow: 0 0 16px -2px var(--glow); }
 
   section.card {
     background: var(--surface-1);
@@ -163,6 +171,7 @@
     border-radius: 14px;
     padding: 20px 22px;
     margin-top: 18px;
+    box-shadow: 0 1px 28px -14px var(--glow);
   }
   section.card h2 {
     font-size: 15px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px;
@@ -174,13 +183,33 @@
   }
   section.card .desc { font-size: 12.5px; color: var(--ink-muted); margin: 0 0 14px; }
 
-  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  /* 3개씩 두 줄(행정동·인구·진입유형 / 경쟁매장·음식업종·실거래가) 고정 배치 — 모바일에서는 아래 미디어쿼리로 2열로 전환 */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .stat-tile {
-    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--page-plane);
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--surface-1);
+    transition: border-color .15s, box-shadow .15s, transform .15s;
   }
-  .stat-tile .label { font-size: 11.5px; font-weight: 700; color: var(--ink-muted); }
-  .stat-tile .value { font-size: 18px; font-weight: 700; margin-top: 3px; }
+  .stat-tile:hover { border-color: var(--brand-strong); box-shadow: 0 0 18px -4px var(--glow); transform: translateY(-1px); }
+  .stat-tile .label { font-size: 11.5px; font-weight: 700; color: var(--ink-muted); letter-spacing: .02em; }
+  .stat-tile .value { font-size: 18px; font-weight: 700; margin-top: 3px; text-shadow: 0 0 18px var(--glow); }
   .stat-tile .foot { font-size: 11px; color: var(--ink-secondary); margin-top: 2px; }
+
+  /* 예상 월매출 시뮬레이션(추정치) — 실데이터 스탯 6종과 시각적으로 확실히 구분되도록 점선 테두리 + 별도 배지 */
+  .sales-estimate-card {
+    margin-top: 14px; border: 1px dashed var(--brand-strong); border-radius: 12px;
+    padding: 14px 16px; background: var(--brand-tint);
+  }
+  .sales-estimate-card .se-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .sales-estimate-card .se-title { font-size: 13px; font-weight: 700; color: var(--ink-primary); }
+  .sales-estimate-card .se-badge {
+    font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px;
+    background: var(--brand-strong); color: #fff; letter-spacing: .03em;
+  }
+  .sales-estimate-card .se-value {
+    font-size: 22px; font-weight: 800; color: var(--brand-strong); margin-top: 8px;
+    text-shadow: 0 0 20px var(--glow);
+  }
+  .sales-estimate-card .se-formula { font-size: 11px; color: var(--ink-muted); margin-top: 8px; line-height: 1.6; }
 
   /* --- map mockup --- */
   .map-wrap {
@@ -331,10 +360,14 @@
   }
 
   /* --- print / PDF export --- */
+  /* 화면은 v2.11부터 다크 미스틱(그라데이션·글로우)이 기본이지만, 인쇄/PDF는 항상 이전과 동일한
+     라이트·무광 스타일로 강제 렌더링한다 — 글로우 효과(box-shadow/text-shadow)도 종이 출력에는
+     불필요하므로 여기서 전부 제거. */
   @media print {
-    :root, :root[data-theme="dark"] { color-scheme: light; }
-    .viz-root, :root[data-theme="dark"] .viz-root {
+    :root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; }
+    .viz-root {
       color-scheme: light !important;
+      background: #ffffff !important;
       --surface-1:      #ffffff !important;
       --page-plane:     #ffffff !important;
       --ink-primary:    #0b0b0b !important;
@@ -345,6 +378,7 @@
       --brand:          #4f8892 !important;
       --brand-strong:   #3d6d76 !important;
       --brand-tint:     #eef4f4 !important;
+      --glow:           transparent !important;
     }
     body { background: #fff; }
     .top-toolbar, .theme-btn, .print-btn { display: none !important; }
@@ -354,17 +388,20 @@
     .addr-input-row button { display: none !important; }
     .addr-input-row input { background: #fff !important; border: 1px solid #ccc !important; }
     .type-toggle { border-color: #999; }
-    .type-toggle button.active { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .type-toggle button.active { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
     .brand-toggle { border-color: #999; }
-    .brand-toggle button.active { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .header-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .brand-toggle button.active { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+    .header-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
     .addr-box .addr-note { display: none; }
     .map-badge { display: none; }
     .report-shell { max-width: 100%; padding: 0; }
     section.card {
-      box-shadow: none; border: 1px solid #ccc;
+      box-shadow: none !important; border: 1px solid #ccc;
       break-inside: avoid; page-break-inside: avoid;
     }
+    .stat-tile { box-shadow: none !important; transform: none !important; }
+    .stat-tile .value, .sales-estimate-card .se-value { text-shadow: none !important; }
+    .sales-estimate-card { border-style: solid; }
     .bar-fill, .meter-fill, #deliveryZone, circle { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .disclaimer { break-inside: avoid; }
   }
@@ -375,9 +412,9 @@
 <div class="report-shell">
 
   <div class="top-toolbar">
-    <span>주소·지도·경쟁점 검색 실연동 · 상권매출은 예시</span>
+    <span>주소·지도·경쟁점 검색 실연동 · 예상 매출은 추정 시뮬레이션(실매출 아님)</span>
     <button class="theme-btn print-btn" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
-    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">다크모드</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">☀ 라이트 모드</button>
   </div>
 
   <!-- HEADER -->
@@ -391,7 +428,7 @@
           <button type="button" data-brand="eunhwasu" onclick="switchBrand('eunhwasu')">은화수식당</button>
         </div>
       </div>
-      <div class="sub">주소를 입력하면 카카오맵으로 실제 위치·경쟁점을 검색합니다 (상권매출은 아직 예시 데이터) — 위 버튼으로 분석할 브랜드를 선택하세요</div>
+      <div class="sub">주소를 입력하면 카카오맵으로 실제 위치·경쟁점을 검색합니다 (예상 매출은 추정 시뮬레이션이며 실매출이 아닙니다) — 위 버튼으로 분석할 브랜드를 선택하세요</div>
     </div>
     <div class="addr-box">
       <label>분석 대상 주소</label>
@@ -429,14 +466,14 @@
         <div class="foot" id="regionDongFoot">서울특별시 성동구</div>
       </div>
       <div class="stat-tile">
-        <div class="label">진입유형</div>
-        <div class="value" id="entryTypeValue">미확인</div>
-        <div class="foot" id="entryTypeFoot">분석 실행 후 카카오맵 실검색으로 판정됩니다</div>
-      </div>
-      <div class="stat-tile">
         <div class="label">시군구 인구</div>
         <div class="value" id="populationValue">27.4만</div>
         <div class="foot" id="populationFoot">공백 읍면동 8곳 (예시)</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">진입유형</div>
+        <div class="value" id="entryTypeValue">미확인</div>
+        <div class="foot" id="entryTypeFoot">분석 실행 후 카카오맵 실검색으로 판정됩니다</div>
       </div>
       <div class="stat-tile">
         <div class="label">경쟁매장 (반경 1km)</div>
@@ -453,6 +490,15 @@
         <div class="value" id="realEstateTradeValue">미확인</div>
         <div class="foot" id="realEstateTradeFoot">국토교통부 실거래가 (분석 실행 후 표시)</div>
       </div>
+    </div>
+
+    <div class="sales-estimate-card">
+      <div class="se-head">
+        <span class="se-title">✨ 예상 월매출 시뮬레이션</span>
+        <span class="se-badge">추정치 · 실매출 아님</span>
+      </div>
+      <div class="se-value" id="salesEstimateValue">분석 실행 후 표시</div>
+      <div class="se-formula" id="salesEstimateFormula">실제 매출 데이터가 아니라, 이 화면에서 실시간으로 조회된 시군구 인구·경쟁매장수·음식업종 밀집도를 브랜드 전국 평균 매출에 보정해 만든 참고용 추정 모델입니다. 상담 시 반드시 "추정치"임을 안내해주세요.</div>
     </div>
   </section>
 
@@ -680,18 +726,31 @@
 </div>
 
 <script>
+  // v2.11부터 "다크 미스틱"(남색·보라 그라데이션)이 기본 테마 — data-theme 속성이 없으면 다크,
+  // "light"면 라이트. 예전엔 반대(속성 없음=라이트, "dark"=다크)였던 것과 정반대로 뒤집힌 것에 주의.
   function toggleTheme() {
     const root = document.documentElement;
     const current = root.getAttribute('data-theme');
-    if (current === 'dark') { root.removeAttribute('data-theme'); }
-    else { root.setAttribute('data-theme', 'dark'); }
+    if (current === 'light') { root.removeAttribute('data-theme'); }
+    else { root.setAttribute('data-theme', 'light'); }
+    updateThemeBtnLabel();
   }
+  function updateThemeBtnLabel() {
+    const btn = document.getElementById('themeBtn');
+    if (!btn) return;
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    btn.textContent = isLight ? '✨ 다크 미스틱' : '☀ 라이트 모드';
+  }
+  updateThemeBtnLabel();
 
   let kakaoOverlays = null;   // { rings: [Circle...], polygon: Polygon } — 배달전문/홀+배당 토글에서 재사용
   let kakaoMapInstance = null; // 지도 인스턴스 재사용 (주소 재검색 시 새로 안 만듦)
   let kakaoMarkers = [];      // CustomOverlay 목록 — 재검색 시 지우고 다시 그림
   let categoryMarkers = [];   // 3번 섹션 업종 키워드 검색으로 찍은 마커 — 별도 관리
   let currentAnalysisCenter = null; // 마지막으로 분석한 위치(kakao.maps.LatLng) — 3번 섹션 검색 기준점
+  // 예상 월매출 시뮬레이션(추정치)에 쓰는 마지막 분석 결과 캐시 — 브랜드 전환·배달/홀 토글 시
+  // 주소를 다시 검색하지 않고도 이 값들로 즉시 재계산한다. 주소 분석을 1회도 안 했으면 null.
+  let lastAnalysisStats = null; // { population, foodTotal, competitorCount }
 
   // 배달권역 폴리곤의 "모양"을 대상지 기준 상대좌표(위도차, 경도차)로 고정해두고,
   // 어떤 주소가 들어와도 그 지점 중심으로 같은 모양을 다시 그린다 (실제 도로기반 계산 전까지의 근사치)
@@ -1243,6 +1302,74 @@
     status.className = 'kakao-key-status ok';
   }
 
+  // --- 예상 월매출 시뮬레이션(추정치) ---
+  // 컴플라이언스 원칙(실제 매장 이름 옆에 가짜 매출 수치를 붙이지 않는다, v2.3의 0-12에서 이미 한 번
+  // 예시 매출표를 이런 이유로 제거한 전례가 있음)을 지키기 위해, 완전 랜덤값이 아니라 이 화면에서 실제로
+  // 실시간 조회되는 값(시군구 인구, 경쟁매장수, 음식업종 밀집도)에 브랜드 전국 평균 매출(BRANDS[..].sim)을
+  // 곱셈 보정하는 "추정 공식"으로 계산한다. 화면에는 항상 "추정치 · 실매출 아님" 배지와 함께 표시하고,
+  // 계산에 쓰인 입력값도 그대로 노출해 트레이니가 근거를 확인할 수 있게 한다.
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function estimateMonthlySales(stats) {
+    if (!stats) return null;
+    const track = (document.querySelector('#typeToggle button.active') || {}).dataset
+      ? document.querySelector('#typeToggle button.active').dataset.type
+      : 'hall';
+    const brand = currentBrand();
+    // 현재 토글된 트랙(배달전문/홀+배달)에 기준 매출이 없으면(예: 은화수식당 배달전문) 반대 트랙으로 대체 —
+    // 이때는 실제로 어느 트랙 수치를 썼는지(usedTrack)를 별도로 남겨서, 화면 라벨이 "배달전문"인데 실제로는
+    // 홀+배달 평균을 쓴 것처럼 잘못 표기되지 않도록 한다.
+    let usedTrack = track;
+    let baseSales = brand.sim[track] && brand.sim[track].sales != null ? brand.sim[track].sales : null;
+    if (baseSales == null) {
+      const fallback = track === 'delivery' ? 'hall' : 'delivery';
+      if (brand.sim[fallback] && brand.sim[fallback].sales != null) {
+        baseSales = brand.sim[fallback].sales;
+        usedTrack = fallback;
+      }
+    }
+    if (baseSales == null) return null;
+
+    // 인구지수 — REGION_POPULATION 전체 평균 대비 이 시군구 인구가 얼마나 큰지(0.75~1.35배로 완충)
+    const avgPop = REGION_POPULATION.reduce((s, r) => s + r.pop, 0) / REGION_POPULATION.length;
+    const popIndex = stats.population != null ? clamp(stats.population / avgPop, 0.75, 1.35) : 1;
+
+    // 상권밀집도지수 — 반경 1km 음식업종 전체 수가 많을수록(유동인구·상권활성도가 높다고 가정) 소폭 상향
+    const densityIndex = stats.foodTotal != null ? clamp(0.85 + (stats.foodTotal - 600) / 4000, 0.8, 1.25) : 1;
+
+    // 경쟁강도보정 — 같은 키워드 경쟁매장이 많을수록 소폭 하향(단, 최대 15%까지만 깎음)
+    const compIndex = stats.competitorCount != null ? clamp(1 - (stats.competitorCount - 6) * 0.015, 0.85, 1.1) : 1;
+
+    const estimate = Math.round(baseSales * popIndex * densityIndex * compIndex);
+    return { estimate, track: usedTrack, selectedTrack: track, baseSales, popIndex, densityIndex, compIndex };
+  }
+
+  function updateSalesEstimateUI() {
+    const valueEl = document.getElementById('salesEstimateValue');
+    const formulaEl = document.getElementById('salesEstimateFormula');
+    if (!valueEl || !formulaEl) return;
+
+    if (!lastAnalysisStats) {
+      valueEl.textContent = '분석 실행 후 표시';
+      return;
+    }
+    const result = estimateMonthlySales(lastAnalysisStats);
+    if (!result) {
+      valueEl.textContent = '추정 불가 (기준 매출 데이터 없음)';
+      formulaEl.textContent = `${currentBrand().name}의 ${document.querySelector('#typeToggle button.active').textContent} 트랙은 아직 기준 매출 자료가 없어 추정할 수 없습니다.`;
+      return;
+    }
+    const trackLabel = result.track === 'delivery' ? '배달전문' : '홀+배달';
+    const fallbackNote = result.track !== result.selectedTrack
+      ? ` (현재 화면은 ${result.selectedTrack === 'delivery' ? '배달전문' : '홀+배달'} 모드지만, 이 브랜드는 해당 트랙 기준 매출이 없어 ${trackLabel} 평균으로 대신 계산)`
+      : '';
+    valueEl.textContent = `약 ${result.estimate.toLocaleString('ko-KR')}만원/월`;
+    formulaEl.textContent =
+      `실제 매출 데이터가 아니라, ${currentBrand().name}(${trackLabel} 트랙) 전국 평균 매출 ${result.baseSales.toLocaleString('ko-KR')}만원에 ` +
+      `이 지역 인구 보정(×${result.popIndex.toFixed(2)})·음식업종 밀집도 보정(×${result.densityIndex.toFixed(2)})·경쟁강도 보정(×${result.compIndex.toFixed(2)})을 ` +
+      `곱해 만든 참고용 추정 모델입니다.${fallbackNote} 상담 시 반드시 "추정치"임을 안내해주세요.`;
+  }
+
   async function runAddressSearch() {
     const address = document.getElementById('addrInput').value.trim();
     const status = document.getElementById('addrStatus');
@@ -1302,6 +1429,7 @@
 
       // 브랜드와 무관한 "반경 1km 음식업종 전체" 수치 — 공공데이터포털 상가업소정보 API(선택 입력, 실패해도
       // 나머지 화면 동작에는 영향 없도록 별도 try/catch로 감쌈).
+      let foodTotalCount = null; // 아래 예상 월매출 시뮬레이션(추정치)에서도 재사용
       try {
         const foodTotal = await fetchFoodStoreTotal(center);
         if (foodTotal) {
@@ -1310,6 +1438,7 @@
             : (foodTotal.stdrYm || '');
           document.getElementById('foodStoreTotalValue').textContent = `${foodTotal.totalCount}개`;
           document.getElementById('foodStoreTotalFoot').textContent = `공공데이터포털 상가업소정보 ${ym} 기준`;
+          foodTotalCount = foodTotal.totalCount;
         } else {
           document.getElementById('foodStoreTotalValue').textContent = '미확인';
           document.getElementById('foodStoreTotalFoot').textContent = '공공데이터포털 서비스키 미입력(API 키 설정에서 입력)';
@@ -1345,6 +1474,10 @@
         document.getElementById('realEstateTradeValue').textContent = '미확인';
         document.getElementById('realEstateTradeFoot').textContent = `국토교통부 실거래가 조회 실패 (${rtmsErr.message})`;
       }
+
+      // 예상 월매출 시뮬레이션(추정치) — 이번 분석에서 실제로 조회된 값들을 캐시해두고 즉시 재계산.
+      lastAnalysisStats = { population: popValue, foodTotal: foodTotalCount, competitorCount: competitors.length };
+      updateSalesEstimateUI();
 
       status.textContent = `✓ 완료 — 반경 1km "${currentBrand().keyword}" 검색 결과 ${competitors.length}건 발견`;
       status.className = 'addr-status ok';
@@ -1396,6 +1529,7 @@
       btn.classList.toggle('active', btn.dataset.brand === id);
     });
     renderBrandContent();
+    updateSalesEstimateUI(); // 브랜드가 바뀌면 전국 평균 매출 기준값도 바뀌므로 즉시 재계산(분석 전이면 안내 문구만 갱신)
 
     // 이미 위치 분석이 된 상태면, 새로 고른 브랜드의 키워드로 경쟁매장 검색을 즉시 다시 실행한다.
     if (currentAnalysisCenter && typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
@@ -1408,6 +1542,7 @@
         document.getElementById('competitorCountFoot').textContent = `"${currentBrand().keyword}" 카카오맵 실검색 (반경 1km)`;
         renderMapData(currentAnalysisCenter, '출점후보지', competitors);
         renderCompetitorTable(competitors);
+        if (lastAnalysisStats) lastAnalysisStats.competitorCount = competitors.length;
 
         // 진입유형도 새 브랜드 이름 기준으로 다시 판정한다.
         try {
@@ -1424,6 +1559,7 @@
           document.getElementById('entryTypeFoot').textContent = `진입유형 판정 실패 (${entryErr.message})`;
         }
 
+        updateSalesEstimateUI(); // 경쟁매장수가 갱신됐으므로 추정치도 다시 반영
         status.textContent = `✓ ${currentBrand().name} 기준 재검색 완료 — 반경 1km ${competitors.length}건 발견`;
         status.className = 'addr-status ok';
       } catch (e) {
@@ -1546,6 +1682,7 @@
       simDelivery.classList.remove('active');
     }
     applyKakaoEmphasis(type);
+    updateSalesEstimateUI(); // 배달전문/홀+배달 트랙이 바뀌면 기준 매출도 달라지므로 추정치 재계산
   }
 
   // --- 6번 섹션: 상담용 투자 시뮬레이션 계산기 ---
