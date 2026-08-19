@@ -7,40 +7,42 @@
 <style>
   /* v2.11 "다크 미스틱" — 기본 테마를 남색·보라 그라데이션 기반으로 전환(신비로운 톤).
      라이트 모드는 이제 opt-in(data-theme="light")이고, 다크(미스틱)가 기본값이다.
-     인쇄/PDF는 항상 라이트로 강제 렌더링(아래 @media print에서 재정의). */
+     인쇄/PDF는 항상 라이트로 강제 렌더링(아래 @media print에서 재정의).
+     v2.15 — 톤앤매너를 보라(violet) 계열에서 블루(azure) 계열로 전면 교체(seq/brand/glow 계열 변수
+     및 헤더바 그라데이션·글로우 rgba 값 전부). 구조(라이트/다크 두 세트, 인쇄 오버라이드)는 그대로 유지. */
   .viz-root {
     color-scheme: dark;
-    --surface-1:      #171335;
-    --page-plane:     #0b0a1c;
-    --ink-primary:    #f4f1ff;
-    --ink-secondary:  #bcaee3;
-    --ink-muted:      #ab9fd4;
-    --gridline:       #2c2657;
-    --baseline:       #3b3470;
-    --border:         rgba(196,163,255,0.16);
-    --seq-100: #cdbaff; --seq-250: #a78bfa; --seq-350: #8b5cf6;
-    --seq-400: #7c3aed; --seq-450: #6d28d9; --seq-550: #4c1d95;
+    --surface-1:      #12203f;
+    --page-plane:     #070c1c;
+    --ink-primary:    #eef3ff;
+    --ink-secondary:  #a9c1e8;
+    --ink-muted:      #9db6e4;
+    --gridline:       #223259;
+    --baseline:       #2e4372;
+    --border:         rgba(147,181,255,0.18);
+    --seq-100: #bfdbfe; --seq-250: #60a5fa; --seq-350: #3b82f6;
+    --seq-400: #2563eb; --seq-450: #1d4ed8; --seq-550: #1e3a8a;
     --status-good: #34d399; --status-warning: #fbbf24;
     --status-serious: #fb923c; --status-critical: #f87171;
-    --brand: #8b5cf6; --brand-strong: #a78bfa; --brand-tint: rgba(139,92,246,0.16);
-    --glow: rgba(167,139,250,0.45);
+    --brand: #3b82f6; --brand-strong: #60a5fa; --brand-tint: rgba(59,130,246,0.16);
+    --glow: rgba(96,165,250,0.45);
   }
   :root[data-theme="light"] .viz-root {
     color-scheme: light;
-    --surface-1:      #fcfcfb;
-    --page-plane:     #f7f5fc;
-    --ink-primary:    #17132b;
-    --ink-secondary:  #52514e;
-    --ink-muted:      #898781;
-    --gridline:       #e1dcf0;
-    --baseline:       #c3c2b7;
-    --border:         rgba(23,19,43,0.10);
-    --seq-100: #e6dcff; --seq-250: #c4aefc; --seq-350: #a78bfa;
-    --seq-400: #8b5cf6; --seq-450: #7c3aed; --seq-550: #5b21b6;
+    --surface-1:      #fbfcfe;
+    --page-plane:     #f4f7fd;
+    --ink-primary:    #101a2e;
+    --ink-secondary:  #4a5568;
+    --ink-muted:      #5c6b85;
+    --gridline:       #dbe6f7;
+    --baseline:       #bcc9de;
+    --border:         rgba(16,26,46,0.10);
+    --seq-100: #dbeafe; --seq-250: #93c5fd; --seq-350: #60a5fa;
+    --seq-400: #3b82f6; --seq-450: #2563eb; --seq-550: #1e40af;
     --status-good: #0ca30c; --status-warning: #fab219;
     --status-serious: #ec835a; --status-critical: #d03b3b;
-    --brand: #7c3aed; --brand-strong: #5b21b6; --brand-tint: #ede6fb;
-    --glow: rgba(124,58,237,0.16);
+    --brand: #2563eb; --brand-strong: #1e40af; --brand-tint: #e2ecff;
+    --glow: rgba(37,99,235,0.16);
   }
 
   * { box-sizing: border-box; }
@@ -50,13 +52,14 @@
   }
   .viz-root {
     /* v2.14 — 배경 이미지(청사진 스타일 상권분석 애니메이션)를 뷰포트에 고정, 위에 반투명 스크림으로
-       텍스트 대비를 유지하고, 그 위에 기존 보라색 글로우 그라데이션을 그대로 겹침(3개 레이어는 스크롤과
-       함께 움직이는 장식용 글로우, 나머지 2개는 뷰포트에 고정된 배경 이미지+어둡게 하는 스크림). */
+       텍스트 대비를 유지하고, 그 위에 기존 블루 글로우 그라데이션을 그대로 겹침(3개 레이어는 스크롤과
+       함께 움직이는 장식용 글로우, 나머지 2개는 뷰포트에 고정된 배경 이미지+어둡게 하는 스크림).
+       v2.15 — 글로우 색상을 보라 → 블루로 교체. */
     background-image:
-      radial-gradient(1100px 560px at 12% -8%, rgba(139,92,246,0.28), transparent 60%),
-      radial-gradient(900px 480px at 100% 0%, rgba(76,29,149,0.30), transparent 55%),
-      radial-gradient(700px 500px at 50% 110%, rgba(109,40,217,0.16), transparent 60%),
-      linear-gradient(rgba(9,8,24,0.74), rgba(9,8,24,0.74)),
+      radial-gradient(1100px 560px at 12% -8%, rgba(59,130,246,0.28), transparent 60%),
+      radial-gradient(900px 480px at 100% 0%, rgba(30,58,138,0.30), transparent 55%),
+      radial-gradient(700px 500px at 50% 110%, rgba(29,78,216,0.16), transparent 60%),
+      linear-gradient(rgba(4,7,18,0.74), rgba(4,7,18,0.74)),
       url('bg-hero.webp');
     background-position: 0 0, 0 0, 0 0, center top, center top;
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
@@ -65,7 +68,17 @@
     background-color: var(--page-plane);
   }
   :root[data-theme="light"] .viz-root {
-    background: var(--page-plane);
+    /* v2.15 — 라이트 모드에도 사용자가 업로드한 라이트 톤 청사진 이미지를 배경으로 적용.
+       이미지 자체가 이미 매우 밝은 화이트/라이트블루 톤이라 옅은 화이트 스크림만 덧대 카드 사이
+       여백의 잔상을 살짝 눌러주고, 카드 내부는 --surface-1 불투명 배경이라 영향이 없다. */
+    background-image:
+      linear-gradient(rgba(244,247,253,0.55), rgba(244,247,253,0.55)),
+      url('bg-hero-light.webp');
+    background-position: center top, center top;
+    background-repeat: no-repeat, no-repeat;
+    background-size: cover, cover;
+    background-attachment: fixed, fixed;
+    background-color: var(--page-plane);
   }
   .viz-root {
     display: block;
@@ -90,16 +103,16 @@
   .theme-btn:hover { border-color: var(--brand); color: var(--brand-strong); }
 
   .header-bar {
-    background: linear-gradient(135deg, #6d28d9, #a855f7 55%, #4c1d95);
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6 55%, #1e3a8a);
     color: #fff;
     border-radius: 16px;
     padding: 22px 26px;
     display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end;
-    box-shadow: 0 10px 36px -10px rgba(139,92,246,0.55), 0 0 0 1px rgba(255,255,255,0.06) inset;
+    box-shadow: 0 10px 36px -10px rgba(59,130,246,0.55), 0 0 0 1px rgba(255,255,255,0.06) inset;
   }
   :root[data-theme="light"] .header-bar {
     background: linear-gradient(135deg, var(--brand-strong), var(--brand));
-    box-shadow: 0 10px 28px -12px rgba(91,33,182,0.35);
+    box-shadow: 0 10px 28px -12px rgba(30,64,175,0.35);
   }
   .header-bar .eyebrow { font-size: 12px; letter-spacing: .06em; opacity: .95; text-transform: uppercase; text-shadow: 0 1px 3px rgba(0,0,0,0.35); }
   .header-bar h1 { margin: 4px 0 2px; font-size: 22px; }
@@ -779,6 +792,7 @@
   let kakaoOverlays = null;   // { rings: [Circle...], polygon: Polygon } — 배달전문/홀+배당 토글에서 재사용
   let kakaoMapInstance = null; // 지도 인스턴스 재사용 (주소 재검색 시 새로 안 만듦)
   let kakaoMarkers = [];      // CustomOverlay 목록 — 재검색 시 지우고 다시 그림
+  let competitorMapMarkers = []; // 경쟁매장 인덱스별 지도 마커(kakaoMarkers의 부분집합) — "제외" 시 개별적으로 지도에서도 숨기기 위한 인덱스 매핑용
   let categoryMarkers = [];   // 3번 섹션 업종 키워드 검색으로 찍은 마커 — 별도 관리
   let currentAnalysisCenter = null; // 마지막으로 분석한 위치(kakao.maps.LatLng) — 3번 섹션 검색 기준점
   // 예상 월매출 시뮬레이션(추정치)에 쓰는 마지막 분석 결과 캐시 — 브랜드 전환·배달/홀 토글 시
@@ -1031,9 +1045,16 @@
     clearCategoryMarkers(); // 위치가 바뀌면 이전 업종검색 마커는 더 이상 유효하지 않음
     currentAnalysisCenter = center;
 
-    const rings = [300, 500, 1000].map(r => {
+    // v2.15 — 반경 300/500/1,000m 링이 카카오맵 실제 타일(밝고 다채로운 배경) 위에서도 잘 보이도록
+    // 진한 블루 + 링별 불투명도 차등(가까운 300m가 가장 또렷, 1,000m가 가장 옅음)으로 강화.
+    const RING_STYLES = [
+      { r: 300, opacity: 0.95, weight: 2.4 },
+      { r: 500, opacity: 0.7, weight: 2 },
+      { r: 1000, opacity: 0.45, weight: 1.8 },
+    ];
+    const rings = RING_STYLES.map(({ r, opacity, weight }) => {
       const circle = new kakao.maps.Circle({
-        center, radius: r, strokeWeight: 1.4, strokeColor: '#898781', strokeOpacity: 0.7,
+        center, radius: r, strokeWeight: weight, strokeColor: '#1d4ed8', strokeOpacity: opacity,
         strokeStyle: 'shortdash', fillColor: '#000000', fillOpacity: 0
       });
       circle.setMap(map);
@@ -1048,14 +1069,18 @@
     });
     polygon.setMap(map);
 
-    kakaoOverlays = { rings, polygon };
+    kakaoOverlays = { rings, ringBaseOpacity: RING_STYLES.map(s => s.opacity), polygon };
 
     addLabeledMarker(map, lat, lng, targetLabel, '#3d6d76');
-    competitors.forEach(c => {
+    // v2.15 — 경쟁매장 인덱스별로 지도 마커를 별도 배열(competitorMapMarkers)에 보관해두면,
+    // 4번 표에서 "제외" 버튼을 누른 경쟁매장의 마커도 지도에서 함께 사라지게 할 수 있다
+    // (excludeCompetitor()에서 같은 인덱스의 마커를 setMap(null) 처리).
+    competitorMapMarkers = [];
+    competitors.forEach((c, idx) => {
       // 지도 라벨은 검색 키워드(c.brand)가 아니라 카카오맵에 등록된 실제 매장명(c.place_name)을 그대로 보여준다.
       const name = c.place_name || c.brand;
       const label = c.distance_m != null ? `${name} ${c.distance_m}m` : name;
-      addLabeledMarker(map, c.lat, c.lng, label, '#ec835a');
+      competitorMapMarkers[idx] = addLabeledMarker(map, c.lat, c.lng, label, '#ec835a');
     });
 
     const activeType = document.querySelector('#typeToggle button.active').dataset.type;
@@ -1306,7 +1331,10 @@
   }
 
   function excludeCompetitor(idx) {
-    excludedCompetitorIdx.add(Number(idx));
+    const i = Number(idx);
+    excludedCompetitorIdx.add(i);
+    // 표에서 제외한 경쟁매장의 지도 마커도 함께 숨긴다(같은 인덱스로 매핑된 competitorMapMarkers 참고).
+    if (competitorMapMarkers[i]) competitorMapMarkers[i].setMap(null);
     renderCompetitorRows();
   }
 
@@ -1712,13 +1740,17 @@
 
   function applyKakaoEmphasis(type) {
     if (!kakaoOverlays) return;
+    // v2.15 — 링별로 차등을 둔 기본 불투명도(ringBaseOpacity, 300m가 가장 또렷)를 유지한 채
+    // 모드 전환에 따른 강약만 배율로 적용(예전엔 전체를 같은 값으로 덮어써 300/500/1000m 구분이 사라졌었음).
+    const emphasisFactor = type === 'delivery' ? 0.35 : 1;
     if (type === 'delivery') {
       kakaoOverlays.polygon.setOptions({ fillOpacity: 0.32 });
-      kakaoOverlays.rings.forEach(r => r.setOptions({ strokeOpacity: 0.25 }));
     } else {
       kakaoOverlays.polygon.setOptions({ fillOpacity: 0.16 });
-      kakaoOverlays.rings.forEach(r => r.setOptions({ strokeOpacity: 0.7 }));
     }
+    kakaoOverlays.rings.forEach((r, i) => {
+      r.setOptions({ strokeOpacity: kakaoOverlays.ringBaseOpacity[i] * emphasisFactor });
+    });
   }
 
   function setStoreType(type) {
