@@ -49,11 +49,20 @@
     font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
   }
   .viz-root {
-    background:
+    /* v2.14 — 배경 이미지(청사진 스타일 상권분석 애니메이션)를 뷰포트에 고정, 위에 반투명 스크림으로
+       텍스트 대비를 유지하고, 그 위에 기존 보라색 글로우 그라데이션을 그대로 겹침(3개 레이어는 스크롤과
+       함께 움직이는 장식용 글로우, 나머지 2개는 뷰포트에 고정된 배경 이미지+어둡게 하는 스크림). */
+    background-image:
       radial-gradient(1100px 560px at 12% -8%, rgba(139,92,246,0.28), transparent 60%),
       radial-gradient(900px 480px at 100% 0%, rgba(76,29,149,0.30), transparent 55%),
       radial-gradient(700px 500px at 50% 110%, rgba(109,40,217,0.16), transparent 60%),
-      var(--page-plane);
+      linear-gradient(rgba(9,8,24,0.74), rgba(9,8,24,0.74)),
+      url('bg-hero.webp');
+    background-position: 0 0, 0 0, 0 0, center top, center top;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    background-size: auto, auto, auto, cover, cover;
+    background-attachment: scroll, scroll, scroll, fixed, fixed;
+    background-color: var(--page-plane);
   }
   :root[data-theme="light"] .viz-root {
     background: var(--page-plane);
@@ -809,8 +818,8 @@
         '신규진입형 지역일 경우 지역 내 브랜드 인지도 사전 축적 없음',
       ],
       sim: {
-        delivery: { invest: 3100, sales: 2400, margin: 20 },
-        hall: { invest: 7530, sales: 3200, margin: 20 },
+        delivery: { invest: 3100, sales: 2800, margin: 20 },
+        hall: { invest: 7530, sales: 4100, margin: 20 },
       },
     },
     eunhwasu: {
