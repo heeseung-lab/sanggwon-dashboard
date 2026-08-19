@@ -492,7 +492,7 @@
     <span>분석일자 <b id="analysisDateValue">2026-08-11</b></span>
     <span>담당자 <b>가맹개발영업팀</b></span>
     <span>진입유형 <b id="entryTypeMeta">미확인</b></span>
-    <span>데이터 출처 <b>카카오맵 API (경쟁점·지도 실연동) · 공공데이터포털 상가업소정보 API (음식업종 전체 실연동) · 국토교통부 상업업무용 부동산 실거래가 API (시군구 단위 실연동) · 한국부동산원 R-ONE 오픈API (소규모 상가 임대료, 시도 단위 실연동) · 예상 매출은 추정 시뮬레이션(실매출 아님)</b></span>
+    <span>데이터 출처 <b>카카오맵 API (경쟁점·지도 실연동) · 공공데이터포털 상가업소정보 API (음식업종 전체 실연동) · 국토교통부 상업업무용 부동산 실거래가 API (시군구 단위 실연동) · 한국부동산원 R-ONE 오픈API (소규모 상가 임대료, 시도 단위, GitHub Actions 배치 갱신) · 예상 매출은 추정 시뮬레이션(실매출 아님)</b></span>
   </div>
 
   <div class="type-toggle" id="typeToggle">
@@ -593,13 +593,7 @@
         </div>
         <p class="map-note">※ 이 키도 Public 저장소라 파일(코드)에는 저장하지 않았습니다 — 입력하면 이 브라우저의 localStorage에만 남고, 아래 "배달 경쟁 등급" 패널에 소상공인365(소상공인시장진흥공단)의 배달분석 화면을 그대로 불러옵니다. 소상공인365에 정식으로 오픈API를 신청해 발급받은 certKey를 입력해주세요(신청: 소상공인365 → 이용안내 → 개방·활용 → 오픈 API 신청, 로그인 필요).</p>
 
-        <div class="kakao-key-bar">
-          <input type="password" id="rebApiKeyInput" value=""
-                 placeholder="한국부동산원 R-ONE 오픈API KEY — 소규모 상가 임대료(시도 단위) 조회용 (reb.or.kr/r-one, 선택 입력 — Public 저장소라 키는 코드에 저장하지 않음)">
-          <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('rebApiKeyInput', this)" title="키 보기/가리기">👁</button>
-          <span id="rebApiKeyStatus" class="kakao-key-status"></span>
-        </div>
-        <p class="map-note">※ 이 키도 Public 저장소라 파일(코드)에는 저장하지 않았습니다 — 입력하면 이 브라우저의 localStorage에만 남고, 1번 지역개요의 "소규모 상가 평균 임대료(시도)" 타일을 한국부동산원 R-ONE 오픈API로 실시간 조회합니다. 이 통계는 시군구가 아니라 <b>시도 단위</b> 평균이며(더 잘게 나눈 상권 단위 데이터도 있으나 주소↔상권 자동 매칭은 아직 지원하지 않음), 평균 임대면적(평수)은 이 통계에 항목 자체가 없어 제공하지 않습니다. 발급: reb.or.kr/r-one → Open API 메뉴에서 신청(로그인 필요).</p>
+        <p class="map-note">※ 1번 지역개요의 "소규모 상가 평균 임대료(시도)" 타일은 한국부동산원 R-ONE 오픈API 데이터를 사용하지만, 브라우저가 reb.or.kr에 직접 보내는 요청은 그쪽 서버에서 차단되는 것이 확인되어(교차출처 요청만 골라 HTTP 503 응답) 이 화면에서 키를 직접 입력받지 않습니다. 대신 GitHub Actions가 주기적으로 서버 쪽에서 조회해 저장소 안의 정적 파일(data/reb_rent_by_sido.json)로 갱신해두면, 이 화면은 그 파일을 그대로 읽어 표시합니다. 이 통계는 시군구가 아니라 <b>시도 단위</b> 평균이며, 평균 임대면적(평수)은 이 통계에 항목 자체가 없어 제공하지 않습니다.</p>
       </div>
     </details>
 
@@ -1332,12 +1326,18 @@
   // 한국부동산원 R-ONE 오픈API(reb.or.kr/r-one) — "임대동향 지역별 임대료(2024년3분기~)_소규모 상가"
   // 통계표(STATBL_ID 고정값, 분기별 갱신)를 조회한다. 이 표는 이름난 상권(약 260곳) 외에 17개 시도 전체의
   // 평균값도 CLS_NM이 시도 이름 그 자체인 행으로 함께 제공하는 것을 실측으로 확인해, 주소↔상권 좌표 매칭 없이도
-  // "시도 단위" 평균은 바로 조회 가능하다(더 잘게 나눈 상권 단위는 좌표 정보가 없어 이름만으로는 신뢰성 있게
-  // 자동 매칭할 방법이 없어 이번엔 보류). 응답 단위는 "천원/㎡"(분기 월평균 임대료) — 원/평 환산은 1평=3.305785㎡로 계산.
+  // "시도 단위" 평균은 바로 조회 가능하다 — 더 잘게 나눈 상권 단위는 좌표 정보가 없어 이름만으로는 신뢰성 있게
+  // 자동 매칭할 방법이 없어 이번엔 보류. 응답 단위는 "천원/㎡"(분기 월평균 임대료) — 원/평 환산은 1평=3.305785㎡로 계산.
   // 평균 임대면적(평수) 항목은 이 통계표 자체에 존재하지 않아(임대료가 이미 단위면적당 값으로 정규화되어 있음)
   // 제공하지 않는다 — 실제로 API 전체 통계표 목록(738개)을 조회해 "면적" 관련 표를 찾아봤으나 이 통계와
   // 연결되는 임대면적 항목은 없었음(있지도 않은 수치를 임의로 추정해 넣지 않는다).
-  const REB_STATBL_ID_SMALL_SHOP_RENT = 'T248223134698125';
+  //
+  // ⚠ 이 대시보드에서 브라우저가 reb.or.kr에 직접 보내는 fetch/XHR 요청은 매번 HTTP 503으로 차단되는 것을
+  // 실측으로 확인했다(같은 순간 curl이나 top-level 페이지 이동으로 같은 URL을 열면 정상 200 — reb.or.kr
+  // 서버가 브라우저의 "교차출처(cross-origin) AJAX 요청"만 골라 차단하는 것으로 보임). 정적 사이트에서
+  // 클라이언트 JS만으로는 이 차단을 우회할 수 없어, 대신 GitHub Actions(scripts/update_reb_rent.py, 매주
+  // 1회 실행)가 서버 쪽에서 미리 조회해 data/reb_rent_by_sido.json 정적 파일로 저장소에 커밋해두고,
+  // 이 화면은 그 정적 파일을 같은 출처(same-origin)로 읽기만 한다 — 그래서 여기엔 API 키 입력이 없다.
   const REB_SIDO_CLSID = {
     '서울특별시': 500002, '부산광역시': 500003, '대구광역시': 500004, '인천광역시': 500005,
     '광주광역시': 500006, '대전광역시': 500007, '울산광역시': 500008, '세종특별자치시': 500009,
@@ -1345,39 +1345,24 @@
     '전라북도': 500014, '전라남도': 500015, '경상북도': 500016, '경상남도': 500017,
     '제주특별자치도': 500018,
   };
-  // 이번 분기는 조사가 아직 끝나지 않아 데이터가 없을 수 있으므로(위 실측으로 확인), 최대 4개 분기를 물러나며
-  // 값이 잡히는 가장 최근 분기를 찾는다 — 국토교통부 실거래가 API의 월 단위 재시도 로직과 같은 패턴.
-  function rebQuarterId(baseDate, back) {
-    const q0 = Math.floor(baseDate.getMonth() / 3); // 0~3
-    let idx = baseDate.getFullYear() * 4 + q0 - back;
-    const year = Math.floor(idx / 4);
-    const q = (idx % 4) + 1; // 1~4
-    return `${year}0${q}`;
+  let rebRentDataPromise = null;
+  function loadRebRentData() {
+    if (!rebRentDataPromise) {
+      rebRentDataPromise = fetch('./data/reb_rent_by_sido.json', { cache: 'no-store' })
+        .then(res => {
+          if (!res.ok) throw new Error(`정적 데이터 파일 응답 오류 (HTTP ${res.status})`);
+          return res.json();
+        });
+    }
+    return rebRentDataPromise;
   }
   async function fetchSmallShopRentBySido(sidoName) {
-    const key = document.getElementById('rebApiKeyInput').value.trim();
-    if (!key) return null;
     const clsId = REB_SIDO_CLSID[sidoName];
     if (!clsId) return null;
-    const now = new Date();
-    for (let back = 0; back < 4; back++) {
-      const wrttimeId = rebQuarterId(now, back);
-      const url = `https://www.reb.or.kr/r-one/openapi/SttsApiTblData.do?KEY=${key}&STATBL_ID=${REB_STATBL_ID_SMALL_SHOP_RENT}&DTACYCLE_CD=QY&WRTTIME_IDTFR_ID=${wrttimeId}&CLS_ID=${clsId}&type=json`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`한국부동산원 R-ONE 응답 오류 (HTTP ${res.status})`);
-      const json = await res.json();
-      if (json.RESULT && json.RESULT.CODE === 'INFO-200') continue; // 해당 분기 데이터 없음 — 한 분기 전으로 재시도
-      if (!json.SttsApiTblData) throw new Error((json.RESULT && json.RESULT.MESSAGE) || 'R-ONE 조회 실패');
-      const row = json.SttsApiTblData[1] && json.SttsApiTblData[1].row && json.SttsApiTblData[1].row[0];
-      if (row) {
-        const perM2Thousand = row.DTA_VAL; // 천원/㎡
-        const perPyeongWon = Math.round(perM2Thousand * 1000 * 3.305785);
-        return { notFound: false, quarterDesc: row.WRTTIME_DESC, perM2Thousand, perPyeongWon };
-      }
-    }
-    // 키/시도 매칭 자체가 안 된 경우(null)와, 키는 있지만 최근 4개 분기 내 값을 못 찾은 경우(notFound)를
-    // 호출부에서 서로 다른 안내 문구로 구분할 수 있도록 구분해서 반환한다.
-    return { notFound: true };
+    const data = await loadRebRentData(); // 실패 시 예외 발생 — 호출부의 try/catch에서 처리
+    const row = data.bySido && data.bySido[sidoName];
+    if (!row) return { notFound: true };
+    return { notFound: false, quarterDesc: data.quarterDesc, perM2Thousand: row.perM2Thousand, perPyeongWon: row.perPyeongWon };
   }
 
   // 공공데이터포털 서비스키는 Public 저장소라 코드(파일)에는 저장하지 않지만, 매번 새로고침할 때마다
@@ -1442,26 +1427,6 @@
         }
       } catch (e) { /* 무시 */ }
       updateSbizIframe();
-    });
-  })();
-
-  // 한국부동산원 R-ONE API 키도 Public 저장소라 파일(코드)에는 저장하지 않고 이 브라우저의 localStorage에만
-  // 남긴다 — 위 공공데이터포털·소상공인365 키와 같은 패턴.
-  (function initRebApiKeyPersistence() {
-    const input = document.getElementById('rebApiKeyInput');
-    if (!input) return;
-    try {
-      const saved = window.localStorage.getItem('sanggwon_rebApiKey');
-      if (saved) input.value = saved;
-    } catch (e) { /* localStorage 접근 불가 환경에서는 조용히 무시 */ }
-    input.addEventListener('input', () => {
-      try {
-        if (input.value.trim()) {
-          window.localStorage.setItem('sanggwon_rebApiKey', input.value.trim());
-        } else {
-          window.localStorage.removeItem('sanggwon_rebApiKey');
-        }
-      } catch (e) { /* 무시 */ }
     });
   })();
 
@@ -1778,7 +1743,7 @@
           const rent = await fetchSmallShopRentBySido(sidoName);
           if (!rent) {
             document.getElementById('rentTradeValue').textContent = '미확인';
-            document.getElementById('rentTradeFoot').textContent = 'R-ONE API 키 미입력(API 키 설정에서 입력)';
+            document.getElementById('rentTradeFoot').textContent = '시도 데이터 없음';
           } else if (rent.notFound) {
             document.getElementById('rentTradeValue').textContent = '미확인';
             document.getElementById('rentTradeFoot').textContent = `한국부동산원 임대동향 (최근 4개 분기 내 ${sidoName} 데이터 없음)`;
