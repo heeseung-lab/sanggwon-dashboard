@@ -252,6 +252,16 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
   .map-note { font-size: 11px; color: var(--ink-muted); margin: 10px 0 0; line-height: 1.6; }
   .map-note code { background: var(--gridline); padding: 1px 5px; border-radius: 4px; font-size: 10.5px; }
+  .roadview-block { margin-top: 18px; }
+  .roadview-title { font-size: 13px; font-weight: 700; color: var(--ink-secondary); margin-bottom: 8px; }
+  .roadview-wrap {
+    position: relative; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface-1); height: 260px;
+  }
+  .roadview-badge {
+    position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.55); color: #fff;
+    font-size: 11px; padding: 4px 9px; border-radius: 999px; z-index: 5;
+  }
 
   .kakao-key-bar {
     display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
@@ -422,6 +432,7 @@
     .header-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
     .addr-box .addr-note { display: none; }
     .map-badge { display: none; }
+    .roadview-block { display: none !important; }
     .report-shell { max-width: 100%; padding: 0; }
     section.card {
       box-shadow: none !important; border: 1px solid #ccc;
@@ -617,6 +628,15 @@
       <span class="item"><span class="legend-dot" style="background:var(--brand);opacity:.5"></span>배달권역(도로기반 추정)</span>
       <span class="item"><span class="legend-dot" style="background:var(--seq-450)"></span>업종 키워드 검색 결과 (3번 섹션)</span>
     </div>
+
+    <div class="roadview-block">
+      <div class="roadview-title">🚶 거리뷰(로드뷰) — 분석 위치 기준</div>
+      <div class="roadview-wrap">
+        <div class="roadview-badge" id="roadviewBadge">분석 실행 후 표시</div>
+        <div id="kakaoRoadviewDiv" style="width:100%;height:100%;"></div>
+      </div>
+      <p class="map-note">※ 카카오맵이 실제로 촬영한 지점에서만 제공되는 기능이라, 촬영 이력이 없는 위치는 "로드뷰 데이터가 없습니다"로 표시될 수 있습니다.</p>
+    </div>
   </section>
 
   <!-- 3. 업종별 상권 데이터 -->
@@ -793,6 +813,7 @@
   let kakaoMapInstance = null; // 지도 인스턴스 재사용 (주소 재검색 시 새로 안 만듦)
   let kakaoMarkers = [];      // CustomOverlay 목록 — 재검색 시 지우고 다시 그림
   let competitorMapMarkers = []; // 경쟁매장 인덱스별 지도 마커(kakaoMarkers의 부분집합) — "제외" 시 개별적으로 지도에서도 숨기기 위한 인덱스 매핑용
+  let kakaoRoadviewInstance = null; // 로드뷰(거리뷰) 인스턴스 재사용 — 분석 위치가 바뀔 때마다 setPanoId로 갱신
   let categoryMarkers = [];   // 3번 섹션 업종 키워드 검색으로 찍은 마커 — 별도 관리
   let currentAnalysisCenter = null; // 마지막으로 분석한 위치(kakao.maps.LatLng) — 3번 섹션 검색 기준점
   // 예상 월매출 시뮬레이션(추정치)에 쓰는 마지막 분석 결과 캐시 — 브랜드 전환·배달/홀 토글 시
@@ -1085,6 +1106,29 @@
 
     const activeType = document.querySelector('#typeToggle button.active').dataset.type;
     applyKakaoEmphasis(activeType);
+
+    updateRoadview(center);
+  }
+
+  // v2.16 — 카카오맵 로드뷰(구글 스트리트뷰에 대응하는 카카오의 거리뷰 기능)를 분석 위치 기준으로
+  // 자동 표시. RoadviewClient.getNearestPanoId로 반경 내 가장 가까운 로드뷰 파노라마를 찾고,
+  // 있으면 Roadview 인스턴스에 그 지점을 표시, 없으면(로드뷰 촬영이 안 된 위치) 안내 배지만 남긴다.
+  function updateRoadview(center) {
+    const badge = document.getElementById('roadviewBadge');
+    const roadviewDiv = document.getElementById('kakaoRoadviewDiv');
+    if (!roadviewDiv || typeof kakao === 'undefined' || !kakao.maps || !kakao.maps.RoadviewClient) return;
+    if (badge) { badge.style.display = 'block'; badge.textContent = '로드뷰 불러오는 중...'; }
+    new kakao.maps.RoadviewClient().getNearestPanoId(center, 50, (panoId) => {
+      if (!panoId) {
+        if (badge) { badge.textContent = '이 위치 반경 50m 내 로드뷰 데이터가 없습니다'; badge.style.display = 'block'; }
+        return;
+      }
+      if (!kakaoRoadviewInstance) {
+        kakaoRoadviewInstance = new kakao.maps.Roadview(roadviewDiv);
+      }
+      kakaoRoadviewInstance.setPanoId(panoId, center);
+      if (badge) { badge.style.display = 'none'; }
+    });
   }
 
   function initKakaoMap() {
