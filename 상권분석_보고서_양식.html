@@ -287,9 +287,18 @@
     color: var(--ink-muted); border-radius: 7px; padding: 6px; font-size: 11.5px; cursor: pointer;
   }
   .sim-reset-btn:hover { background: var(--page-plane); color: var(--ink-secondary); }
+
+  .competitor-toggle-btn {
+    border: 1px solid var(--border); background: transparent; color: var(--ink-secondary);
+    border-radius: 999px; padding: 6px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  }
+  .competitor-toggle-btn:hover { background: var(--page-plane); color: var(--brand-strong); border-color: var(--brand); }
+
   @media print {
     .sim-input { border: none; background: transparent; }
     .sim-reset-btn { display: none; }
+    .competitor-toggle-row { display: none !important; }
+    .competitor-extra-row { display: table-row !important; }
   }
 
   .score-list { display: flex; flex-direction: column; gap: 10px; }
@@ -989,22 +998,53 @@
     return dedup;
   }
 
-  function renderCompetitorTable(competitors) {
-    const tbody = document.getElementById('competitorRows');
-    if (!competitors.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--ink-muted);padding:16px;">반경 1km 내 검색된 경쟁 브랜드가 없습니다.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = competitors.map(c => `
+  // 표에는 가까운 5개까지만 기본으로 보여주고, 반경 1km 내 나머지는 "더보기" 버튼을 눌러야 펼쳐지도록 한다
+  // (경쟁매장이 15~20개씩 나오는 상권에서 표가 한없이 길어지는 걸 방지) — competitors는 이미 거리순 정렬돼 있음.
+  const COMPETITOR_NEAR_COUNT = 5;
+
+  function competitorRowHtml(c) {
+    return `
       <tr>
         <td>${c.place_name || c.brand}${c.place_name && c.place_name !== c.brand ? ` <span style="color:var(--ink-muted);font-size:11.5px;">("${c.brand}" 검색)</span>` : ''}</td>
         <td>${c.distance_m != null ? c.distance_m + 'm' : '-'}</td>
         <td style="color:var(--ink-muted);font-size:12px;">데이터 연동 예정</td>
         <td style="color:var(--ink-muted);">-</td>
         <td style="color:var(--ink-muted);">-</td>
-      </tr>`).join('');
-    document.getElementById('competitorTableNote').textContent =
-      '※ 카카오맵 실검색 결과입니다(위치·거리는 실데이터). 매출·리뷰·배달비중은 아직 연동 전이라 표시하지 않습니다 — 실제 수치가 아닌 값을 실제 매장명 옆에 표시하지 않기 위한 조치입니다.';
+      </tr>`;
+  }
+
+  function renderCompetitorTable(competitors) {
+    const tbody = document.getElementById('competitorRows');
+    if (!competitors.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--ink-muted);padding:16px;">반경 1km 내 검색된 경쟁 브랜드가 없습니다.</td></tr>';
+      return;
+    }
+    const nearRows = competitors.slice(0, COMPETITOR_NEAR_COUNT).map(competitorRowHtml).join('');
+    const extra = competitors.slice(COMPETITOR_NEAR_COUNT);
+    let toggleRowHtml = '';
+    let extraRowsHtml = '';
+    if (extra.length) {
+      extraRowsHtml = extra.map(c => competitorRowHtml(c).replace('<tr>', '<tr class="competitor-extra-row" style="display:none;">')).join('');
+      toggleRowHtml = `
+        <tr class="competitor-toggle-row">
+          <td colspan="5" style="text-align:center;padding:10px;">
+            <button type="button" class="competitor-toggle-btn" onclick="toggleCompetitorExtra(this)">반경 1km 내 ${extra.length}개 매장 더보기 ▾</button>
+          </td>
+        </tr>`;
+    }
+    tbody.innerHTML = nearRows + toggleRowHtml + extraRowsHtml;
+    document.getElementById('competitorTableNote').textContent = extra.length
+      ? `※ 카카오맵 실검색 결과입니다(위치·거리는 실데이터). 가까운 ${COMPETITOR_NEAR_COUNT}개를 우선 표시하며, "더보기"를 누르면 반경 1km 내 나머지 ${extra.length}개까지 모두 볼 수 있습니다. 매출·리뷰·배달비중은 아직 연동 전이라 표시하지 않습니다 — 실제 수치가 아닌 값을 실제 매장명 옆에 표시하지 않기 위한 조치입니다.`
+      : '※ 카카오맵 실검색 결과입니다(위치·거리는 실데이터). 매출·리뷰·배달비중은 아직 연동 전이라 표시하지 않습니다 — 실제 수치가 아닌 값을 실제 매장명 옆에 표시하지 않기 위한 조치입니다.';
+  }
+
+  function toggleCompetitorExtra(btn) {
+    const tbody = document.getElementById('competitorRows');
+    const extraRows = tbody.querySelectorAll('.competitor-extra-row');
+    if (!extraRows.length) return;
+    const isHidden = extraRows[0].style.display === 'none';
+    extraRows.forEach(r => { r.style.display = isHidden ? 'table-row' : 'none'; });
+    btn.textContent = isHidden ? '접기 ▴' : `반경 1km 내 ${extraRows.length}개 매장 더보기 ▾`;
   }
 
   // 사용자가 3번 섹션 키워드를 직접 입력하면(브랜드 자동채움이 아니라) 브랜드를 바꿔도 그 값을 유지한다.
