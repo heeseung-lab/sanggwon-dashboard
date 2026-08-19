@@ -1,0 +1,49 @@
+name: Update REB small-shop rent data
+
+# 배경: 대시보드(GitHub Pages, 정적 사이트)에서 브라우저가 reb.or.kr로 직접 보내는
+# 교차출처(cross-origin) fetch/XHR 요청이 서버 쪽에서 HTTP 503으로 차단되는 것을
+# 확인했다(curl이나 브라우저 주소창 직접 접속은 같은 순간에도 정상 200). 그래서
+# 이 워크플로가 대신 서버 쪽에서 한국부동산원 R-ONE 오픈API를 호출해 결과를
+# data/reb_rent_by_sido.json 정적 파일로 커밋해두고, 대시보드는 그 파일을
+# 같은 출처(same-origin)로 읽기만 한다.
+#
+# 사전 준비(저장소 소유자가 직접 해야 함 — Claude가 대신 입력하지 않음):
+#   Settings → Secrets and variables → Actions → New repository secret
+#   이름: REB_API_KEY / 값: 한국부동산원 R-ONE 오픈API 발급 키
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'  # 매주 월요일 03:00 UTC(한국시간 12:00) — 원본 통계가 분기 단위라 주 1회면 충분
+  workflow_dispatch: {}  # Actions 탭에서 수동 실행도 가능
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch REB small-shop rent data
+        env:
+          REB_API_KEY: ${{ secrets.REB_API_KEY }}
+        run: python scripts/update_reb_rent.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/reb_rent_by_sido.json
+          if git diff --cached --quiet; then
+            echo "변경 없음 — 커밋 생략"
+          else
+            git commit -m "chore: 한국부동산원 R-ONE 소규모 상가 임대료(시도) 데이터 갱신"
+            git push
+          fi
