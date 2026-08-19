@@ -174,7 +174,7 @@
   }
   section.card .desc { font-size: 12.5px; color: var(--ink-muted); margin: 0 0 14px; }
 
-  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
   .stat-tile {
     border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--page-plane);
   }
@@ -410,7 +410,7 @@
     <span>분석일자 <b>2026-08-11</b></span>
     <span>담당자 <b>가맹개발영업팀</b></span>
     <span>진입유형 <b id="entryTypeMeta">해당없음</b></span>
-    <span>데이터 출처 <b>카카오맵 API (경쟁점·지도 실연동) · 공공데이터 상권매출(예시)</b></span>
+    <span>데이터 출처 <b>카카오맵 API (경쟁점·지도 실연동) · 공공데이터포털 상가업소정보 API (음식업종 전체 실연동) · 공공데이터 상권매출(예시)</b></span>
   </div>
 
   <div class="type-toggle" id="typeToggle">
@@ -421,7 +421,7 @@
   <!-- 1. 지역개요 -->
   <section class="card">
     <h2><span class="step">1</span> 지역 개요</h2>
-    <p class="desc">시군구 인구는 KOSIS 공공데이터, 경쟁매장은 선택한 브랜드 키워드로 카카오맵을 실시간 검색한 결과 기준입니다 (진입유형 항목은 추후 별도 분석 예정)</p>
+    <p class="desc">시군구 인구는 KOSIS 공공데이터, 경쟁매장은 선택한 브랜드 키워드로 카카오맵을 실시간 검색한 결과, 음식업종 전체 수는 공공데이터포털(소상공인시장진흥공단 상가업소정보)을 실시간 검색한 결과 기준입니다 (진입유형 항목은 추후 별도 분석 예정)</p>
     <div class="stat-grid">
       <div class="stat-tile">
         <div class="label">행정동</div>
@@ -442,6 +442,11 @@
         <div class="label">경쟁매장 (반경 1km)</div>
         <div class="value" id="competitorCountValue">8개</div>
         <div class="foot" id="competitorCountFoot">"떡볶이" 카카오맵 실검색 (예시)</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">음식업종 전체 (반경 1km)</div>
+        <div class="value" id="foodStoreTotalValue">미확인</div>
+        <div class="foot" id="foodStoreTotalFoot">공공데이터포털 상가업소정보 (분석 실행 후 표시)</div>
       </div>
     </div>
   </section>
@@ -471,6 +476,14 @@
         </div>
         <p class="map-note key-saved-note">※ 이 파일에는 "검색 API" 승인키가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다 — 실제 검색까지 확인된 키입니다.</p>
         <p class="map-note">※ 이 키가 없어도 헤더 입력창에 주소를 직접 타이핑해서 "분석"을 누르는 방식은 그대로 동작합니다 — 이 키는 "동/도로명만 입력해도 목록에서 골라 선택"하는 검색에만 필요합니다.</p>
+
+        <div class="kakao-key-bar">
+          <input type="password" id="dataGoKrKeyInput" value=""
+                 placeholder="공공데이터포털 서비스키 — 소상공인시장진흥공단 상가(상권)정보 API (data.go.kr, 선택 입력 — Public 저장소라 키는 코드에 저장하지 않음)">
+          <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('dataGoKrKeyInput', this)" title="키 보기/가리기">👁</button>
+          <span id="dataGoKrKeyStatus" class="kakao-key-status"></span>
+        </div>
+        <p class="map-note">※ 이 저장소는 Public이라 이 키는 파일에 저장해두지 않았습니다 — 키를 입력하면 "반경 1km 내 음식업종 전체" 수치(1번 지역개요)를 이 API로 실시간 조회합니다. 입력값은 이 브라우저에만 남고 저장소에는 올라가지 않으니, 매번 이 화면에서 입력해야 합니다(브라우저를 새로고침하면 사라짐). data.go.kr에서 받은 "Encoding" 값을 그대로 붙여넣어주세요.</p>
       </div>
     </details>
 
@@ -998,6 +1011,28 @@
     return dedup;
   }
 
+  // 반경 1km 내 "음식업종 전체" 사업체수 — 공공데이터포털(소상공인시장진흥공단 상가업소정보 API,
+  // storeListInRadius, indsLclsCd=I2)을 실시간 호출한다. 카카오 키워드검색("떡볶이"/"돈가스" 등 브랜드
+  // 키워드 한정)과 달리 이건 음식업종 전체(한식/카페/치킨/주점 등 다 포함) 밀도를 보여주는 값이라
+  // 브랜드와 무관하게 항상 같은 수치이며, 두 수치를 나란히 보면 "브랜드 키워드 경쟁점"과 "전체 상권 밀집도"를
+  // 구분해서 볼 수 있다. 응답에 totalCount·stdrYm(데이터 기준월)이 함께 온다.
+  async function fetchFoodStoreTotal(center) {
+    const key = document.getElementById('dataGoKrKeyInput').value.trim();
+    if (!key) return null;
+    const cx = center.getLng ? center.getLng() : center.lng;
+    const cy = center.getLat ? center.getLat() : center.lat;
+    const url = `https://apis.data.go.kr/B553077/api/open/sdsc2/storeListInRadius?serviceKey=${key}&radius=1000&cx=${cx}&cy=${cy}&indsLclsCd=I2&type=json&numOfRows=1&pageNo=1`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`공공데이터포털 응답 오류 (HTTP ${res.status})`);
+    const json = await res.json();
+    if (!json.header || json.header.resultCode !== '00') {
+      // NODATA_ERROR(03)는 정상적으로 "0건"인 경우도 포함하므로 0건으로 처리
+      if (json.header && json.header.resultCode === '03') return { totalCount: 0, stdrYm: json.header.stdrYm };
+      throw new Error((json.header && json.header.resultMsg) || '공공데이터포털 조회 실패');
+    }
+    return { totalCount: json.body.totalCount, stdrYm: json.header.stdrYm };
+  }
+
   // 표에는 가까운 5개까지만 기본으로 보여주고, 반경 1km 내 나머지는 "더보기" 버튼을 눌러야 펼쳐지도록 한다
   // (경쟁매장이 15~20개씩 나오는 상권에서 표가 한없이 길어지는 걸 방지) — competitors는 이미 거리순 정렬돼 있음.
   const COMPETITOR_NEAR_COUNT = 5;
@@ -1135,6 +1170,25 @@
 
       renderMapData(center, '출점후보지', competitors);
       renderCompetitorTable(competitors);
+
+      // 브랜드와 무관한 "반경 1km 음식업종 전체" 수치 — 공공데이터포털 상가업소정보 API(선택 입력, 실패해도
+      // 나머지 화면 동작에는 영향 없도록 별도 try/catch로 감쌈).
+      try {
+        const foodTotal = await fetchFoodStoreTotal(center);
+        if (foodTotal) {
+          const ym = /^\d{6}$/.test(foodTotal.stdrYm || '')
+            ? `${foodTotal.stdrYm.slice(0, 4)}년 ${parseInt(foodTotal.stdrYm.slice(4, 6), 10)}월`
+            : (foodTotal.stdrYm || '');
+          document.getElementById('foodStoreTotalValue').textContent = `${foodTotal.totalCount}개`;
+          document.getElementById('foodStoreTotalFoot').textContent = `공공데이터포털 상가업소정보 ${ym} 기준`;
+        } else {
+          document.getElementById('foodStoreTotalValue').textContent = '미확인';
+          document.getElementById('foodStoreTotalFoot').textContent = '공공데이터포털 서비스키 미입력(API 키 설정에서 입력)';
+        }
+      } catch (foodErr) {
+        document.getElementById('foodStoreTotalValue').textContent = '미확인';
+        document.getElementById('foodStoreTotalFoot').textContent = `공공데이터포털 조회 실패 (${foodErr.message})`;
+      }
 
       status.textContent = `✓ 완료 — 반경 1km "${currentBrand().keyword}" 검색 결과 ${competitors.length}건 발견`;
       status.className = 'addr-status ok';
