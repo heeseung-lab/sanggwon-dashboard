@@ -902,7 +902,9 @@
 
     addLabeledMarker(map, lat, lng, targetLabel, '#3d6d76');
     competitors.forEach(c => {
-      const label = c.distance_m != null ? `${c.brand} ${c.distance_m}m` : c.brand;
+      // 지도 라벨은 검색 키워드(c.brand)가 아니라 카카오맵에 등록된 실제 매장명(c.place_name)을 그대로 보여준다.
+      const name = c.place_name || c.brand;
+      const label = c.distance_m != null ? `${name} ${c.distance_m}m` : name;
       addLabeledMarker(map, c.lat, c.lng, label, '#ec835a');
     });
 
@@ -995,7 +997,7 @@
     }
     tbody.innerHTML = competitors.map(c => `
       <tr>
-        <td>${c.brand}${c.place_name && c.place_name !== c.brand ? ` <span style="color:var(--ink-muted);font-size:11.5px;">(${c.place_name})</span>` : ''}</td>
+        <td>${c.place_name || c.brand}${c.place_name && c.place_name !== c.brand ? ` <span style="color:var(--ink-muted);font-size:11.5px;">("${c.brand}" 검색)</span>` : ''}</td>
         <td>${c.distance_m != null ? c.distance_m + 'm' : '-'}</td>
         <td style="color:var(--ink-muted);font-size:12px;">데이터 연동 예정</td>
         <td style="color:var(--ink-muted);">-</td>
