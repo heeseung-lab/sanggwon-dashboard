@@ -1501,6 +1501,18 @@
     });
   })();
 
+  // API 키 입력창들(카카오/juso/공공데이터포털/소상공인365 2종)은 새로고침 후에도 localStorage에
+  // 저장된 값으로 미리 채워져 있는 경우가 많다 — 그 상태에서 사용자가 클릭 후 바로 타이핑하면(전체
+  // 선택 없이) 커서 위치에 새 문자가 "삽입"될 뿐 기존 값이 지워지지 않아, 두 값이 이어붙은 손상된
+  // 키가 만들어질 수 있다(특히 type="password"라 화면에 점으로만 보여 원래 값이 남아있는지 눈으로
+  // 확인하기 어려움). 실제로 이 손상된 키를 그대로 iframe에 넘기면 소상공인365 쪽에서 "등록된
+  // 인증키가 없습니다" 오류로 이어지는 것을 확인함 — 포커스 시 기존 내용을 전체 선택해두면, 이어서
+  // 타이핑하거나 붙여넣기만 해도 항상 깨끗하게 새 값으로 교체되어 이런 손상을 원천 차단할 수 있다.
+  ['kakaoKeyInput', 'jusoKeyInput', 'dataGoKrKeyInput', 'sbizCertKeyInput', 'sbizSalesCertKeyInput'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('focus', () => el.select());
+  });
+
   // 표에는 가까운 5개까지만 기본으로 보여주고, 반경 1km 내 나머지는 "더보기" 버튼을 눌러야 펼쳐지도록 한다
   // (경쟁매장이 15~20개씩 나오는 상권에서 표가 한없이 길어지는 걸 방지) — competitors는 이미 거리순 정렬돼 있음.
   const COMPETITOR_NEAR_COUNT = 5;
