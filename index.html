@@ -257,13 +257,13 @@
   .roadview-title { font-size: 13px; font-weight: 700; color: var(--ink-secondary); margin-bottom: 8px; }
   .roadview-wrap {
     position: relative; border-radius: 12px; overflow: hidden;
-    border: 1px solid var(--border); background: var(--surface-1); height: 260px;
+    border: 1px solid var(--border); background: var(--surface-1); height: 520px;
   }
   .roadview-badge {
     position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.55); color: #fff;
     font-size: 11px; padding: 4px 9px; border-radius: 999px; z-index: 5;
   }
-  .sbiz-block { margin-top: 18px; }
+  .sbiz-trigger-block { margin-top: 18px; }
   .sbiz-region-hint {
     display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
     padding: 10px 14px; border-radius: 10px; background: var(--brand-tint);
@@ -276,7 +276,30 @@
     border: 1px solid var(--border); background: var(--surface-1); height: 640px;
     display: flex; align-items: center; justify-content: center;
   }
-  .sbiz-sales-block { margin-top: 18px; }
+  .sbiz-trigger-btn {
+    border: none; background: var(--brand); color: #fff; border-radius: 8px;
+    padding: 9px 16px; font-size: 12.5px; font-weight: 700; cursor: pointer; margin-top: 2px;
+  }
+  .sbiz-trigger-btn:hover { background: var(--brand-strong); }
+  .sbiz-modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(5,6,15,0.72);
+    z-index: 200; align-items: center; justify-content: center; padding: 24px;
+  }
+  .sbiz-modal-overlay.is-open { display: flex; }
+  .sbiz-modal {
+    width: min(1100px, 100%); max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  .sbiz-modal-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px;
+  }
+  .sbiz-modal-header .title { font-size: 15px; font-weight: 700; color: var(--ink-primary); }
+  .sbiz-modal-close {
+    border: none; background: transparent; color: var(--ink-secondary); font-size: 20px;
+    cursor: pointer; line-height: 1; padding: 4px 9px; border-radius: 8px; flex-shrink: 0;
+  }
+  .sbiz-modal-close:hover { background: var(--gridline); }
 
   .kakao-key-bar {
     display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
@@ -448,8 +471,8 @@
     .addr-box .addr-note { display: none; }
     .map-badge { display: none; }
     .roadview-block { display: none !important; }
-    .sbiz-block { display: none !important; }
-    .sbiz-sales-block { display: none !important; }
+    .sbiz-trigger-block { display: none !important; }
+    .sbiz-modal-overlay { display: none !important; }
     .report-shell { max-width: 100%; padding: 0; }
     section.card {
       box-shadow: none !important; border: 1px solid #ccc;
@@ -678,26 +701,48 @@
       <p class="map-note">※ 카카오맵이 실제로 촬영한 지점에서만 제공되는 기능이라, 촬영 이력이 없는 위치는 "로드뷰 데이터가 없습니다"로 표시될 수 있습니다.</p>
     </div>
 
-    <div class="sbiz-block" id="sbizBlock">
+    <div class="sbiz-trigger-block" id="sbizBlock">
       <div class="roadview-title">🛵 배달 경쟁 등급 — 소상공인365 (행정동·업종 단위)</div>
-      <div class="sbiz-region-hint" id="sbizRegionHint">📍 분석 지역: <b id="sbizRegionHintText">분석 실행 후 표시</b> — 이 위젯은 자동으로 이동하지 않으니, 아래 "위치선택" 드롭다운에서 같은 지역을 직접 선택해주세요.</div>
+      <div class="sbiz-region-hint" id="sbizRegionHint">📍 분석 지역: <b id="sbizRegionHintText">분석 실행 후 표시</b> — 이 위젯은 자동으로 이동하지 않으니, 팝업 안 "위치선택" 드롭다운에서 같은 지역을 직접 선택해주세요.</div>
+      <button type="button" class="sbiz-trigger-btn" onclick="openSbizModal()">배달 경쟁 등급 위젯 열기</button>
+      <p class="map-note">※ 소상공인365(소상공인시장진흥공단) 자체 화면을 그대로 불러오는 위젯입니다. 버튼을 누르면 팝업으로 열리며, 팝업 안에서 시도·시군구·업종을 직접 선택해 <b>행정동 단위</b> 배달 매출 등급(빨강=낮음~파랑=높음)을 확인할 수 있습니다. 이 대시보드의 분석 주소와 자동으로 연동되지는 않으며(외부 사이트라 위치 전달 불가), 특정 매장 실명에 결부된 수치가 아니라 동네·업종 단위 집계이므로 우리가 임의로 추정한 값이 아니라 소상공인365가 직접 제공하는 데이터입니다.</p>
+    </div>
+
+    <div class="sbiz-trigger-block" id="sbizSalesBlock">
+      <div class="roadview-title">📊 지역·업종 평균 매출 추이 — 소상공인365 (점포당 매출액)</div>
+      <div class="sbiz-region-hint" id="sbizSalesRegionHint">📍 분석 지역: <b id="sbizSalesRegionHintText">분석 실행 후 표시</b> — 이 위젯도 자동으로 이동하지 않으니, 팝업 안에서 같은 지역과 브랜드 업종을 직접 선택해주세요.</div>
+      <button type="button" class="sbiz-trigger-btn" onclick="openSbizSalesModal()">지역·업종 매출 추이 위젯 열기</button>
+      <p class="map-note">※ 소상공인365가 제공하는 "점포당 매출액 추이"(지역×업종별 월평균 추정매출, 최대 13개월) 화면을 그대로 불러오는 위젯입니다. 버튼을 누르면 팝업으로 열리며, 팝업 안에서 시도·시군구와 업종(247개 분류)을 직접 선택해 확인하며, 실명 있는 개별 경쟁매장의 매출이 아니라 그 지역·업종 전체의 <b>평균 추정치</b>이므로 우리가 임의로 추정한 값이 아니라 소상공인365가 직접 제공하는 참고용 데이터입니다(점포 면적·입점 위치 등에 따라 실제와 달라질 수 있음 — 소상공인365 자체 고지). 배달 경쟁 등급과 마찬가지로 이 대시보드의 분석 주소와 자동으로 연동되지는 않습니다.</p>
+    </div>
+  </section>
+
+  <div class="sbiz-modal-overlay" id="sbizModalOverlay" onclick="if(event.target===this) closeSbizModal()">
+    <div class="sbiz-modal">
+      <div class="sbiz-modal-header">
+        <div class="title">🛵 배달 경쟁 등급 — 소상공인365 (행정동·업종 단위)</div>
+        <button type="button" class="sbiz-modal-close" onclick="closeSbizModal()" aria-label="닫기">✕</button>
+      </div>
       <div class="sbiz-wrap" id="sbizWrap">
         <div class="roadview-badge" id="sbizBadge">위 "⚙ API 키 설정"에서 소상공인365 certKey를 입력하면 표시됩니다</div>
         <iframe id="sbizIframe" title="소상공인365 배달분석" style="display:none;width:100%;height:100%;border:0;"></iframe>
       </div>
       <p class="map-note">※ 소상공인365(소상공인시장진흥공단) 자체 화면을 그대로 불러온 것으로, 위젯 안에서 시도·시군구·업종을 직접 선택해 <b>행정동 단위</b> 배달 매출 등급(빨강=낮음~파랑=높음)을 확인할 수 있습니다. 이 대시보드의 분석 주소와 자동으로 연동되지는 않으며(외부 사이트라 위치 전달 불가), 특정 매장 실명에 결부된 수치가 아니라 동네·업종 단위 집계이므로 우리가 임의로 추정한 값이 아니라 소상공인365가 직접 제공하는 데이터입니다.</p>
     </div>
+  </div>
 
-    <div class="sbiz-sales-block" id="sbizSalesBlock">
-      <div class="roadview-title">📊 지역·업종 평균 매출 추이 — 소상공인365 (점포당 매출액)</div>
-      <div class="sbiz-region-hint" id="sbizSalesRegionHint">📍 분석 지역: <b id="sbizSalesRegionHintText">분석 실행 후 표시</b> — 이 위젯도 자동으로 이동하지 않으니, 아래 위젯 안에서 같은 지역과 브랜드 업종을 직접 선택해주세요.</div>
+  <div class="sbiz-modal-overlay" id="sbizSalesModalOverlay" onclick="if(event.target===this) closeSbizSalesModal()">
+    <div class="sbiz-modal">
+      <div class="sbiz-modal-header">
+        <div class="title">📊 지역·업종 평균 매출 추이 — 소상공인365 (점포당 매출액)</div>
+        <button type="button" class="sbiz-modal-close" onclick="closeSbizSalesModal()" aria-label="닫기">✕</button>
+      </div>
       <div class="sbiz-wrap" id="sbizSalesWrap">
         <div class="roadview-badge" id="sbizSalesBadge">위 "⚙ API 키 설정"에서 소상공인365 "점포당 매출액 추이" certKey를 입력하면 표시됩니다</div>
         <iframe id="sbizSalesIframe" title="소상공인365 점포당 매출액 추이" style="display:none;width:100%;height:100%;border:0;"></iframe>
       </div>
       <p class="map-note">※ 소상공인365가 제공하는 "점포당 매출액 추이"(지역×업종별 월평균 추정매출, 최대 13개월) 화면을 그대로 불러온 것입니다. 위젯 안에서 시도·시군구와 업종(247개 분류)을 직접 선택해 확인하며, 실명 있는 개별 경쟁매장의 매출이 아니라 그 지역·업종 전체의 <b>평균 추정치</b>이므로 우리가 임의로 추정한 값이 아니라 소상공인365가 직접 제공하는 참고용 데이터입니다(점포 면적·입점 위치 등에 따라 실제와 달라질 수 있음 — 소상공인365 자체 고지). 배달 경쟁 등급과 마찬가지로 이 대시보드의 분석 주소와 자동으로 연동되지는 않습니다.</p>
     </div>
-  </section>
+  </div>
 
   <!-- 3. 업종별 상권 데이터 -->
   <section class="card">
@@ -1502,6 +1547,30 @@
       updateSbizSalesIframe();
     });
   })();
+
+  // 배달 경쟁 등급 / 지역·업종 매출 추이 위젯은 항상 화면에 인라인으로 깔아두면 공간을 너무 많이
+  // 차지해서, 평소에는 버튼만 보이는 트리거 카드로 두고 클릭 시에만 풀스크린 팝업(모달)으로 열도록
+  // 구성한다. 위 updateSbizIframe()/updateSbizSalesIframe()와 certKey 저장 로직은 그대로 두고,
+  // 여기서는 그 위젯을 감싼 오버레이에 'is-open' 클래스만 토글한다.
+  function openSbizModal() {
+    const overlay = document.getElementById('sbizModalOverlay');
+    if (overlay) overlay.classList.add('is-open');
+  }
+  function closeSbizModal() {
+    const overlay = document.getElementById('sbizModalOverlay');
+    if (overlay) overlay.classList.remove('is-open');
+  }
+  function openSbizSalesModal() {
+    const overlay = document.getElementById('sbizSalesModalOverlay');
+    if (overlay) overlay.classList.add('is-open');
+  }
+  function closeSbizSalesModal() {
+    const overlay = document.getElementById('sbizSalesModalOverlay');
+    if (overlay) overlay.classList.remove('is-open');
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeSbizModal(); closeSbizSalesModal(); }
+  });
 
   // API 키 입력창들(카카오/juso/공공데이터포털/소상공인365 2종)은 새로고침 후에도 localStorage에
   // 저장된 값으로 미리 채워져 있는 경우가 많다 — 그 상태에서 사용자가 클릭 후 바로 타이핑하면(전체
