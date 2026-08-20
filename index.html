@@ -1460,7 +1460,9 @@
 
   // 소상공인365 "점포당 매출액 추이" 위젯 — 배달분석과 별개의 certKey가 필요함(기능별로 certKey가
   // 나뉘어 있음을 실측으로 확인 — 배달분석용 키로 이 경로를 열면 403 에러가 남). 진입 경로는 배달분석과
-  // 같은 패턴으로 "#/openApi/selng"(내부적으로 "점포당 매출액 추이" 패널이 로그인 없이 슬라이드인으로 열림).
+  // 같은 패턴으로 "#/openApi/slsIdex"(내부적으로 "점포당 매출액 추이" 패널이 로그인 없이 슬라이드인으로 열림).
+  // ※ v2.21에서 "#/openApi/selng"으로 잘못 연동돼 있었던 것을 사용자가 공유한 소상공인365 자체
+  // "오픈 API 신청결과 상세정보" 화면(API URL 필드)을 근거로 "slsIdex"가 정확한 경로임을 확인해 수정함.
   function updateSbizSalesIframe() {
     const input = document.getElementById('sbizSalesCertKeyInput');
     const badge = document.getElementById('sbizSalesBadge');
@@ -1476,7 +1478,7 @@
     }
     badge.style.display = 'none';
     iframe.style.display = 'block';
-    iframe.src = 'https://bigdata.sbiz.or.kr/#/openApi/selng?certKey=' + encodeURIComponent(key);
+    iframe.src = 'https://bigdata.sbiz.or.kr/#/openApi/slsIdex?certKey=' + encodeURIComponent(key);
   }
 
   // 이 certKey도 Public 저장소라 파일(코드)에는 저장하지 않고 이 브라우저의 localStorage에만 남긴다 —
