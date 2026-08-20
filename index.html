@@ -1438,9 +1438,43 @@
     return { notFound: false, quarterDesc: data.quarterDesc, perM2Thousand: row.perM2Thousand, perPyeongWon: row.perPyeongWon };
   }
 
+  // "설정 전달 링크" 지원: 인증키(공공데이터포털/소상공인365 2종)는 이 브라우저의 localStorage에만
+  // 저장되므로, 카카오톡 인앱브라우저·이메일 클라이언트 등 "다른 저장소를 쓰는 앱/기기"로 평소 링크를
+  // 열면 그 저장소가 비어 있어 관련 위젯이 "키를 입력하세요" 상태로 보이는 문제가 있었다(사용자 제보,
+  // 2026-08-20). 이를 해결하기 위해, 쿼리 파라미터(dataGoKrKey/sbizKey/sbizSalesKey)에 키가 담긴
+  // "설정 전달 링크"를 한 번만 열면 그 값을 이 브라우저의 localStorage에 저장해두고, 이후로는 키가
+  // 없는 평소의 일반 링크만 열어도 계속 정상 동작한다. 이 전달 링크는 관리자가 한 번 만들어두고
+  // 반복 재사용 가능(1회용 아님) — 새 기기/새 앱마다 그 기기·그 앱에서 딱 한 번만 열어주면 된다.
+  // 키는 절대 이 코드/저장소(파일)에 직접 하드코딩하지 않으며, 저장 후에는 history.replaceState로
+  // 주소창의 쿼리스트링을 즉시 지워 뒤로가기 기록·화면 캡처 등에 키가 남지 않도록 한다.
+  (function applyProvisioningLinkKeys() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const map = {
+        dataGoKrKey: 'sanggwon_dataGoKrKey',
+        sbizKey: 'sanggwon_sbizCertKey',
+        sbizSalesKey: 'sanggwon_sbizSalesCertKey',
+      };
+      let applied = false;
+      Object.keys(map).forEach((param) => {
+        const v = params.get(param);
+        if (v) {
+          window.localStorage.setItem(map[param], v);
+          applied = true;
+        }
+      });
+      if (applied) {
+        const url = new URL(window.location.href);
+        url.search = '';
+        window.history.replaceState({}, document.title, url.toString());
+      }
+    } catch (e) { /* localStorage 접근 불가 환경(예: 시크릿모드 일부)에서는 조용히 무시 */ }
+  })();
+
   // 공공데이터포털 서비스키는 Public 저장소라 코드(파일)에는 저장하지 않지만, 매번 새로고침할 때마다
   // 다시 입력해야 하면 사용성이 너무 떨어지므로 이 브라우저의 localStorage에만 남겨둔다 — 저장소에는
-  // 절대 올라가지 않고, 이 브라우저·이 컴퓨터에서만 유지된다(다른 기기·시크릿모드는 별도 입력 필요).
+  // 절대 올라가지 않고, 이 브라우저·이 컴퓨터에서만 유지된다(다른 기기·시크릿모드는 별도 입력 필요,
+  // 단 아래 "설정 전달 링크"로 한 번만 전달하면 이후엔 별도 입력 없이도 유지됨).
   (function initDataGoKrKeyPersistence() {
     const input = document.getElementById('dataGoKrKeyInput');
     if (!input) return;
