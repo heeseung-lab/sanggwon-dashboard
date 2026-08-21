@@ -610,28 +610,29 @@
         <p class="map-note">※ 이 키가 없어도 헤더 입력창에 주소를 직접 타이핑해서 "분석"을 누르는 방식은 그대로 동작합니다 — 이 키는 "동/도로명만 입력해도 목록에서 골라 선택"하는 검색에만 필요합니다.</p>
 
         <div class="kakao-key-bar">
-          <input type="password" id="dataGoKrKeyInput" value=""
-                 placeholder="공공데이터포털 서비스키 — 상가(상권)정보 · 국토교통부 실거래가 API 공용 (data.go.kr, 선택 입력 — Public 저장소라 키는 코드에 저장하지 않음)">
+          <input type="password" id="dataGoKrKeyInput" value="VKd3GCABLSetJZK18KyWY%2BlhDXZniWnFoxvpDEQ%2B1daCxUJjpoKSbxZRScLJlAQLMgQWMX09MDzz%2FkvcvyX%2Bww%3D%3D"
+                 placeholder="공공데이터포털 서비스키 — 상가(상권)정보 · 국토교통부 실거래가 API 공용 (data.go.kr, 선택 입력)">
           <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('dataGoKrKeyInput', this)" title="키 보기/가리기">👁</button>
           <span id="dataGoKrKeyStatus" class="kakao-key-status"></span>
         </div>
-        <p class="map-note">※ 이 저장소는 Public이라 이 키는 파일(코드)에는 저장해두지 않았습니다 — 키를 입력하면 "반경 1km 내 음식업종 전체"(1번 지역개요)와 "인근 상업용 부동산 실거래가"(1번 지역개요) 두 수치를 모두 이 하나의 키로 실시간 조회합니다(공공데이터포털은 같은 계정 키를 여러 API에 공용으로 쓸 수 있습니다). 대신 이 브라우저의 로컬 저장소(localStorage)에 남겨두어, 한 번 입력하면 이 브라우저·이 컴퓨터에서는 새로고침해도 다시 입력할 필요 없습니다(다른 브라우저·기기·시크릿모드에서는 다시 입력 필요, 저장소 코드에는 절대 올라가지 않음). data.go.kr에서 받은 "Encoding" 값을 그대로 붙여넣어주세요.</p>
+        <p class="map-note key-saved-note">※ 이 파일에는 이 서비스키가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다(v2.25부터, 카카오톡·이메일 등 다른 앱/기기로 열어도 항상 바로 동작하도록 카카오/juso 키와 같은 방식으로 전환됨). 키를 입력하면 "반경 1km 내 음식업종 전체"(1번 지역개요)와 "인근 상업용 부동산 실거래가"(1번 지역개요) 두 수치를 모두 이 하나의 키로 실시간 조회합니다(공공데이터포털은 같은 계정 키를 여러 API에 공용으로 쓸 수 있습니다). 다른 키로 교체하려면 이 입력창에 새 값을 붙여넣으면 이 브라우저에서는 그 값이 우선 적용됩니다(data.go.kr에서 받은 "Encoding" 값을 그대로 붙여넣어주세요).</p>
 
         <div class="kakao-key-bar">
-          <input type="password" id="sbizCertKeyInput" value=""
-                 placeholder="소상공인365 오픈API certKey — 배달분석(행정동 단위 배달매출 등급) 위젯용 (bigdata.sbiz.or.kr, 선택 입력 — Public 저장소라 키는 코드에 저장하지 않음)">
+          <input type="password" id="sbizCertKeyInput" value="7350dabd2f853b15518a66378da4ce0cb844c9855cb935259fbca2a78f1fe735"
+                 placeholder="소상공인365 오픈API certKey — 배달분석(행정동 단위 배달매출 등급) 위젯용 (bigdata.sbiz.or.kr, 선택 입력)">
           <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('sbizCertKeyInput', this)" title="키 보기/가리기">👁</button>
           <span id="sbizCertKeyStatus" class="kakao-key-status"></span>
         </div>
-        <p class="map-note">※ 이 키도 Public 저장소라 파일(코드)에는 저장하지 않았습니다 — 입력하면 이 브라우저의 localStorage에만 남고, 아래 "배달 경쟁 등급" 패널에 소상공인365(소상공인시장진흥공단)의 배달분석 화면을 그대로 불러옵니다. 소상공인365에 정식으로 오픈API를 신청해 발급받은 certKey를 입력해주세요(신청: 소상공인365 → 이용안내 → 개방·활용 → 오픈 API 신청, 로그인 필요).</p>
+        <p class="map-note key-saved-note">※ 이 파일에는 이 certKey가 이미 저장되어 있어 매번 다시 입력할 필요 없습니다(v2.25부터) — 아래 "배달 경쟁 등급" 패널에 소상공인365(소상공인시장진흥공단)의 배달분석 화면을 그대로 불러옵니다. 다른 키로 교체하려면 이 입력창에 새 값을 붙여넣으면 이 브라우저에서는 그 값이 우선 적용됩니다(신청: 소상공인365 → 이용안내 → 개방·활용 → 오픈 API 신청, 로그인 필요).</p>
 
         <div class="kakao-key-bar">
-          <input type="password" id="sbizSalesCertKeyInput" value=""
-                 placeholder="소상공인365 오픈API certKey — 점포당 매출액 추이(지역·업종 평균 매출) 위젯용 (bigdata.sbiz.or.kr, 선택 입력 — Public 저장소라 키는 코드에 저장하지 않음)">
+          <input type="password" id="sbizSalesCertKeyInput" value="77236961e6fca4e83d44f68ac939c68a2321bdcbccab3e87079df02744ab220c"
+                 placeholder="소상공인365 오픈API certKey — 점포당 매출액 추이(지역·업종 평균 매출) 위젯용 (bigdata.sbiz.or.kr, 선택 입력)">
           <button type="button" class="key-eye-btn" onclick="toggleKeyVisibility('sbizSalesCertKeyInput', this)" title="키 보기/가리기">👁</button>
           <span id="sbizSalesCertKeyStatus" class="kakao-key-status"></span>
         </div>
-        <p class="map-note">※ 위 배달분석 certKey와는 <b>별도로 발급받아야 하는 키</b>입니다(소상공인365는 기능별로 certKey가 나뉘어 있어, 배달분석용 키로는 이 위젯이 열리지 않습니다). 이 키도 Public 저장소라 파일(코드)에는 저장하지 않았습니다 — 입력하면 이 브라우저의 localStorage에만 남고, 아래 "지역·업종 평균 매출 추이" 패널에 소상공인365의 "점포당 매출액 추이" 화면을 그대로 불러옵니다. 이 데이터는 소상공인365 자체 업종 분류(247개) 기준 지역×업종 단위 <b>평균 추정매출액</b>이며, 실명 있는 개별 매장의 매출이 아닙니다.</p>
+        <p class="map-note key-saved-note">※ 위 배달분석 certKey와는 <b>별도로 발급받아야 하는 키</b>입니다(소상공인365는 기능별로 certKey가 나뉘어 있어, 배달분석용 키로는 이 위젯이 열리지 않습니다). 이 파일에는 이 certKey도 이미 저장되어 있어 매번 다시 입력할 필요 없습니다(v2.25부터) — 아래 "지역·업종 평균 매출 추이" 패널에 소상공인365의 "점포당 매출액 추이" 화면을 그대로 불러옵니다. 이 데이터는 소상공인365 자체 업종 분류(247개) 기준 지역×업종 단위 <b>평균 추정매출액</b>이며, 실명 있는 개별 매장의 매출이 아닙니다.</p>
+        <p class="map-note">※ 위 3개 키(공공데이터포털·소상공인365 2종)는 v2.25부터 카카오/juso 키와 동일하게 이 파일에 기본값으로 포함되어, 어떤 기기·어떤 앱(카카오톡 인앱브라우저 포함)에서 열어도 짧은 링크만으로 항상 바로 동작합니다. 다만 이 저장소는 Public이라 누구나 페이지 소스에서 이 값을 볼 수 있으므로, 실제 운영 전 재발급을 권장합니다 — 사용자가 이 입력창에 다른 값을 직접 입력하면 그 브라우저에서는 그 값이 우선 사용됩니다.</p>
 
         <p class="map-note">※ 1번 지역개요의 "소규모 상가 평균 임대료(시도)" 타일은 한국부동산원 R-ONE 오픈API 데이터를 사용하지만, 브라우저가 reb.or.kr에 직접 보내는 요청은 그쪽 서버에서 차단되는 것이 확인되어(교차출처 요청만 골라 HTTP 503 응답) 이 화면에서 키를 직접 입력받지 않습니다. 대신 GitHub Actions가 주기적으로 서버 쪽에서 조회해 저장소 안의 정적 파일(data/reb_rent_by_sido.json)로 갱신해두면, 이 화면은 그 파일을 그대로 읽어 표시합니다. 이 통계는 시군구가 아니라 <b>시도 단위</b> 평균이며, 평균 임대면적(평수)은 이 통계에 항목 자체가 없어 제공하지 않습니다.</p>
       </div>
@@ -1438,15 +1439,14 @@
     return { notFound: false, quarterDesc: data.quarterDesc, perM2Thousand: row.perM2Thousand, perPyeongWon: row.perPyeongWon };
   }
 
-  // "설정 전달 링크" 지원: 인증키(공공데이터포털/소상공인365 2종)는 이 브라우저의 localStorage에만
-  // 저장되므로, 카카오톡 인앱브라우저·이메일 클라이언트 등 "다른 저장소를 쓰는 앱/기기"로 평소 링크를
-  // 열면 그 저장소가 비어 있어 관련 위젯이 "키를 입력하세요" 상태로 보이는 문제가 있었다(사용자 제보,
-  // 2026-08-20). 이를 해결하기 위해, 쿼리 파라미터(dataGoKrKey/sbizKey/sbizSalesKey)에 키가 담긴
-  // "설정 전달 링크"를 한 번만 열면 그 값을 이 브라우저의 localStorage에 저장해두고, 이후로는 키가
-  // 없는 평소의 일반 링크만 열어도 계속 정상 동작한다. 이 전달 링크는 관리자가 한 번 만들어두고
-  // 반복 재사용 가능(1회용 아님) — 새 기기/새 앱마다 그 기기·그 앱에서 딱 한 번만 열어주면 된다.
-  // 키는 절대 이 코드/저장소(파일)에 직접 하드코딩하지 않으며, 저장 후에는 history.replaceState로
-  // 주소창의 쿼리스트링을 즉시 지워 뒤로가기 기록·화면 캡처 등에 키가 남지 않도록 한다.
+  // "설정 전달 링크" 지원(v2.24에서 도입): 쿼리 파라미터(dataGoKrKey/sbizKey/sbizSalesKey)에 키가
+  // 담긴 링크를 열면 그 값을 이 브라우저의 localStorage에 저장해, 사용자가 자신만의 certKey로 교체하고
+  // 싶을 때 입력창을 직접 열지 않고도 링크 하나로 전달할 수 있게 해준다. ※ v2.25부터는 아래 3개 입력창
+  // 자체에 기본 인증키가 이미 하드코딩되어 있어(카카오/juso 키와 같은 방식) 카카오톡·이메일 등 어떤
+  // 앱/기기로 열어도 이 메커니즘 없이 짧은 링크만으로 항상 동작하므로, 이 기능은 필수는 아니지만
+  // 특정 사용자가 자신의 개인 키로 일시적으로 교체해보고 싶을 때 등에는 여전히 유용해 남겨둔다.
+  // 저장 후에는 history.replaceState로 주소창의 쿼리스트링을 즉시 지워 뒤로가기 기록 등에 키가
+  // 남지 않도록 한다.
   (function applyProvisioningLinkKeys() {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -1471,10 +1471,10 @@
     } catch (e) { /* localStorage 접근 불가 환경(예: 시크릿모드 일부)에서는 조용히 무시 */ }
   })();
 
-  // 공공데이터포털 서비스키는 Public 저장소라 코드(파일)에는 저장하지 않지만, 매번 새로고침할 때마다
-  // 다시 입력해야 하면 사용성이 너무 떨어지므로 이 브라우저의 localStorage에만 남겨둔다 — 저장소에는
-  // 절대 올라가지 않고, 이 브라우저·이 컴퓨터에서만 유지된다(다른 기기·시크릿모드는 별도 입력 필요,
-  // 단 아래 "설정 전달 링크"로 한 번만 전달하면 이후엔 별도 입력 없이도 유지됨).
+  // 공공데이터포털 서비스키는 v2.25부터 위 입력창에 기본값으로 하드코딩되어 있어 별도 입력 없이도
+  // 항상 동작한다. 사용자가 자신의 다른 키로 교체해 입력하면, 그 값을 이 브라우저의 localStorage에
+  // 남겨 새로고침해도 그 교체값이 계속 우선 적용되도록 한다(다른 브라우저·기기는 하드코딩된 기본값으로
+  // 돌아가며, 그 상태에서도 계속 정상 동작함 — 시크릿모드도 마찬가지).
   (function initDataGoKrKeyPersistence() {
     const input = document.getElementById('dataGoKrKeyInput');
     if (!input) return;
@@ -1515,8 +1515,9 @@
     iframe.src = 'https://bigdata.sbiz.or.kr/#/openApi/delivery?certKey=' + encodeURIComponent(key);
   }
 
-  // 이 certKey도 Public 저장소라 파일(코드)에는 저장하지 않고 이 브라우저의 localStorage에만 남긴다 —
-  // 위 공공데이터포털 키와 같은 패턴(재입력 없이 새로고침 유지, 다른 기기/시크릿모드는 별도 입력 필요).
+  // 이 certKey도 v2.25부터 위 입력창에 기본값으로 하드코딩되어 있어 별도 입력 없이도 항상 동작한다.
+  // 위 공공데이터포털 키와 같은 패턴으로, 사용자가 직접 다른 값을 입력하면 그 브라우저의 localStorage에
+  // 남아 새로고침해도 그 교체값이 계속 우선 적용된다.
   (function initSbizCertKeyPersistence() {
     const input = document.getElementById('sbizCertKeyInput');
     if (!input) return;
@@ -1560,7 +1561,7 @@
     iframe.src = 'https://bigdata.sbiz.or.kr/#/openApi/slsIdex?certKey=' + encodeURIComponent(key);
   }
 
-  // 이 certKey도 Public 저장소라 파일(코드)에는 저장하지 않고 이 브라우저의 localStorage에만 남긴다 —
+  // 이 certKey도 v2.25부터 위 입력창에 기본값으로 하드코딩되어 있어 별도 입력 없이도 항상 동작한다 —
   // 배달분석 certKey와 동일한 패턴이나, 저장 키 이름은 별도로 구분(sanggwon_sbizSalesCertKey).
   (function initSbizSalesCertKeyPersistence() {
     const input = document.getElementById('sbizSalesCertKeyInput');
