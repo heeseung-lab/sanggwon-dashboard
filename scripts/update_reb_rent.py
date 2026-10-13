@@ -12,6 +12,11 @@ data/reb_rent_by_sido.json 정적 파일로 저장한다.
 
 필요 환경변수: REB_API_KEY (GitHub 저장소 Secrets에 등록 — 이 스크립트 파일이나
 워크플로 파일 어디에도 실제 키 값은 저장하지 않는다).
+
+안정성: R-ONE 서버가 연속 요청 시 응답 없이 연결을 끊는 경우가 있어, 요청 사이에
+간격을 두고(REQUEST_INTERVAL), User-Agent를 지정하고, 재시도 간격을 점점 늘린다.
+네트워크 오류로 수집하지 못한 시도가 하나라도 있으면 비정상 종료(exit 1)하여
+일부만 채워진 데이터가 기존 파일을 덮어쓰지 않게 한다.
 """
 import json
 import os
@@ -32,6 +37,14 @@ SIDO_CLSID = {
     "제주특별자치도": 500018,
 }
 
+REQUEST_INTERVAL = 1.5  # 요청 사이 대기(초) — 서버의 연결 차단 방지
+RETRIES = 5             # 요청 1건당 최대 시도 횟수
+BACKOFF = [3, 6, 12, 24]  # 재시도 전 대기(초), 점점 늘림
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; sanggwon-dashboard-bot/1.0; +https://github.com/heeseung-lab/sanggwon-dashboard)",
+    "Accept": "application/json",
+}
+
 
 def quarter_id(base, back):
     q0 = (base.month - 1) // 3
@@ -41,15 +54,17 @@ def quarter_id(base, back):
     return f"{year}0{q}"
 
 
-def fetch_json(url, retries=3):
+def fetch_json(url, retries=RETRIES):
     last_err = None
-    for _ in range(retries):
+    for attempt in range(retries):
         try:
-            with urllib.request.urlopen(url, timeout=20) as resp:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=30) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except Exception as e:
             last_err = e
-            time.sleep(2)
+            if attempt < retries - 1:
+                time.sleep(BACKOFF[min(attempt, len(BACKOFF) - 1)])
     raise last_err
 
 
@@ -62,9 +77,11 @@ def main():
     now = datetime.now(timezone.utc)
     by_sido = {}
     quarter_desc = None
+    failed = []  # 네트워크 오류로 수집하지 못한 시도
 
     for sido, cls_id in SIDO_CLSID.items():
         found = False
+        net_error = False
         for back in range(4):
             wrttime_id = quarter_id(now, back)
             url = (
@@ -72,10 +89,12 @@ def main():
                 f"?KEY={key}&STATBL_ID={STATBL_ID}&DTACYCLE_CD=QY"
                 f"&WRTTIME_IDTFR_ID={wrttime_id}&CLS_ID={cls_id}&type=json"
             )
+            time.sleep(REQUEST_INTERVAL)
             try:
                 data = fetch_json(url)
             except Exception as e:
-                print(f"[{sido}] 요청 실패: {e}", file=sys.stderr)
+                print(f"[{sido}] 요청 실패({wrttime_id}): {e}", file=sys.stderr)
+                net_error = True
                 continue
             result = data.get("RESULT")
             if result and result.get("CODE") == "INFO-200":
@@ -102,6 +121,15 @@ def main():
             break
         if not found:
             print(f"[{sido}] 최근 4개 분기 내 데이터를 찾지 못했습니다.", file=sys.stderr)
+            if net_error:
+                failed.append(sido)
+
+    if failed:
+        print(
+            f"수집 실패 시도 {len(failed)}곳({', '.join(failed)}) — 기존 데이터 보호를 위해 파일을 저장하지 않고 종료합니다.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     output = {
         "generatedAt": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
